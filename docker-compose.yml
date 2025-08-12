@@ -1,0 +1,24 @@
+services:
+  next-app:
+    container_name: next-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_REST_API_ENDPOINT: http://api.erbio.com.tw
+        AUTH_KEYCLOAK_ID: b2b
+        AUTH_KEYCLOAK_SECRET: 3oHrPBHNnHXfAbI6i1Rp8upIIOLMcHSe
+        AUTH_KEYCLOAK_ISSUER: https://auth.snq.org.tw/realms/ibmi
+        AUTH_SECRET: dJrM+22oRHxZ/aPQ5HGv80Dr8CpxA0YmpNV3UjWO45Q=
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - my_network
+
+  # Add more containers below (nginx, postgres, etc.)
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  my_network:

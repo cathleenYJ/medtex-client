@@ -1,0 +1,17 @@
+:root {
+    --fc-button-active-bg-color: var(--color-b2b-lv6);
+    --fc-button-hover-bg-color: var(--color-b2b-lv5);
+    --fc-button-bg-color: var(--color-b2b-lv4);
+    --fc-page-bg-color: transparent;
+    --fc-event-bg-color: var(--color-b2b-lv4);
+    --fc-event-border-color: var(--color-b2b-lv4);
+    --fc-border-color: var(--color-b2b-gray);
+}
+
+.fc-scrollgrid {
+    border: none !important;
+}
+
+.fc-timegrid-slot-label-cushion {
+    font-size: 0.75rem;
+}

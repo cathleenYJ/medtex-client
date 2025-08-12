@@ -1,0 +1,145 @@
+@import "tailwindcss";
+@import "./variables/flex-gap.css";
+@import "./variables/themes.css";
+@import "./variables/calendar.css";
+@import "./variables/custom-styles.css";
+
+:root {
+    --scroll-bar-width: 2px;
+}
+
+@theme {
+    /* Default theme colors */
+    --color-medtex-blue-light: #2BCEFF;
+    --color-medtex-purple: #C1BAE1;
+    --color-medtex-blue: #191E30;
+    --color-medtex-blue-lv4: #8994C0;
+    --color-medtex-gray: #E4E4F1;
+    --color-medtex-gray-lv4: #8A8A97;
+    --color-medtex-lv1: #BBC6F2;
+
+    /* Default theme colors */
+    --color-b2b-light: #EAFFF1;
+    --color-b2b-bg: #021212;
+    --color-b2b-gray: #303635;
+    --color-b2b-lv1: #DAFFE1;
+    --color-b2b-lv2: #91FD8B;
+    --color-b2b-lv3: #50AC6A;
+    --color-b2b-lv4: #007956;
+    --color-b2b-lv5: #0D564B;
+    --color-b2b-lv6: #184743;
+
+    /* Green theme colors */
+    --color-b2b-green-light: #eafff1;
+    --color-b2b-green-bg: #021212;
+    --color-b2b-green-gray: #303635;
+    --color-b2b-green-lv1: #AFDDBA;
+    --color-b2b-green-lv2: #84E394;
+    --color-b2b-green-lv3: #499380;
+    --color-b2b-green-lv4: #26705D;
+    --color-b2b-green-lv5: #10423E;
+    --color-b2b-green-lv6: #043632;
+
+    /* Blue theme colors */
+    --color-b2b-blue-light: #e4ebff;
+    --color-b2b-blue-bg: #071022;
+    --color-b2b-blue-gray: #313036;
+    --color-b2b-blue-lv1: #c2d4ff;
+    --color-b2b-blue-lv2: #93c2ff;
+    --color-b2b-blue-lv3: #5f77f2;
+    --color-b2b-blue-lv4: #353dab;
+    --color-b2b-blue-lv5: #342c8b;
+    --color-b2b-blue-lv6: #2c266f;
+
+    /* Red theme colors */
+    --color-b2b-red-light: #fff7ff;
+    --color-b2b-red-bg: #0f050d;
+    --color-b2b-red-gray: #363034;
+    --color-b2b-red-lv1: #ddccd6;
+    --color-b2b-red-lv2: #cf81af;
+    --color-b2b-red-lv3: #8b4063;
+    --color-b2b-red-lv4: #592344;
+    --color-b2b-red-lv5: #451f3e;
+    --color-b2b-red-lv6: #351b30;
+
+    /* Static utility colors */
+    --color-appointment-btn: #ffe500;
+    --color-filter-options: #252932;
+    --color-checkbox-border: #c1c5c6;
+    --color-checkbox-bg: #3e424b;
+    --color-img-bg: #d3d3d3;
+    --color-danger: #A71650;
+    --color-success: #00d68f;
+    --color-cancel: #4b5560;
+
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+    --text-sm--line-height: 1.75;
+    --text-base--line-height: 1.75;
+    --text-lg--line-height: 1.55;
+    --text-xl--line-height: 1.5;
+    --text-2xl: 1.375rem;
+    --text-2xl--line-height: 1.5;
+    --text-3xl: 1.5rem;
+    --text-3xl--line-height: 1.5;
+    --text-4xl: 1.75rem;
+    --text-4xl--line-height: 1.5;
+    --text-5xl: 2rem;
+    --text-5xl--line-height: 1.33;
+    --text-6xl: 2.25rem;
+    --text-6xl--line-height: 1.25;
+    --text-7xl: 2.5rem;
+    --text-7xl--line-height: 1.25;
+    --text-8xl: 2.75rem;
+    --text-8xl--line-height: 1.25;
+    --text-9xl: 3rem;
+    --text-9xl--line-height: 1.25;
+    --shadow-btn: var(--btn-shadow);
+    --profile-banner: var(--profile-banner);
+    --container-7xl: 75rem;
+    --breakpoint-xs: 31.25rem;
+    --breakpoint-sm: 50rem;
+    --breakpoint-md: 64rem;
+    --breakpoint-lg: 80rem;
+    --breakpoint-xl: 90rem;
+    --animate-loading: loading 0.8s infinite linear;
+    --animate-btn-loading: btn-loading 0.8s infinite linear;
+
+    @keyframes loading {
+
+        0%,
+        100% {
+            height: var(--h);
+        }
+
+        50% {
+            height: 0;
+        }
+    }
+
+    @keyframes btn-loading {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+}
+
+::-webkit-scrollbar {
+    width: var(--scroll-bar-width);
+    height: var(--scroll-bar-width);
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    width: var(--scroll-bar-width);
+    height: var(--scroll-bar-width);
+    border-radius: var(--scroll-bar-width);
+    background: rgb(255 255 255 / 0.2);
+}

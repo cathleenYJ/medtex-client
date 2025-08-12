@@ -1,0 +1,122 @@
+/* Theme switching logic - Override Tailwind colors based on data attributes */
+
+/* Green theme */
+:root:has([data-theme="green"]),
+[data-component-theme="green"] {
+    --color-b2b-light: var(--color-b2b-green-light);
+    --color-b2b-bg: var(--color-b2b-green-bg);
+    --color-b2b-gray: var(--color-b2b-green-gray);
+    --color-b2b-lv1: var(--color-b2b-green-lv1);
+    --color-b2b-lv2: var(--color-b2b-green-lv2);
+    --color-b2b-lv3: var(--color-b2b-green-lv3);
+    --color-b2b-lv4: var(--color-b2b-green-lv4);
+    --color-b2b-lv5: var(--color-b2b-green-lv5);
+    --color-b2b-lv6: var(--color-b2b-green-lv6);
+}
+
+/* Blue theme */
+:root:has([data-theme="blue"]),
+[data-component-theme="blue"] {
+    --color-b2b-light: var(--color-b2b-blue-light);
+    --color-b2b-bg: var(--color-b2b-blue-bg);
+    --color-b2b-gray: var(--color-b2b-blue-gray);
+    --color-b2b-lv1: var(--color-b2b-blue-lv1);
+    --color-b2b-lv2: var(--color-b2b-blue-lv2);
+    --color-b2b-lv3: var(--color-b2b-blue-lv3);
+    --color-b2b-lv4: var(--color-b2b-blue-lv4);
+    --color-b2b-lv5: var(--color-b2b-blue-lv5);
+    --color-b2b-lv6: var(--color-b2b-blue-lv6);
+}
+
+/* Red theme */
+:root:has([data-theme="red"]),
+[data-component-theme="red"] {
+    --color-b2b-light: var(--color-b2b-red-light);
+    --color-b2b-bg: var(--color-b2b-red-bg);
+    --color-b2b-gray: var(--color-b2b-red-gray);
+    --color-b2b-lv1: var(--color-b2b-red-lv1);
+    --color-b2b-lv2: var(--color-b2b-red-lv2);
+    --color-b2b-lv3: var(--color-b2b-red-lv3);
+    --color-b2b-lv4: var(--color-b2b-red-lv4);
+    --color-b2b-lv5: var(--color-b2b-red-lv5);
+    --color-b2b-lv6: var(--color-b2b-red-lv6);
+}
+
+/* Legacy CSS variables for non-Tailwind usage */
+:root {
+  --circle-left: #10103a;      /* 深藍 */
+  --circle-right: #3a75ea;     /* 青藍 */
+  --gradient-end: #a34c7f;     /* 紫紅 */
+}
+
+:root:has([data-admin]) {
+    --circle-left: #E4E4F1;
+    --circle-right: #BBC6F2;
+    --gradient-end: #C1BAE1;
+}
+
+/* homepage Recommended */
+[data-card-theme="a"] {
+    --card-text: #000;
+    --card-btn-bg: #006a5e;
+    --card-btn-text: #fff;
+}
+
+[data-card-theme="b"] {
+    --card-text: #fff;
+    --card-btn-bg: #fff;
+    --card-btn-text: #000;
+}
+
+[data-card-theme="c"] {
+    --card-text: #fff;
+    --card-btn-bg: #fff;
+    --card-btn-text: #00007f;
+}
+
+/* buyer result */
+[data-card-theme="green"] {
+    --gradient-end: #0d464a;
+    --attribute-block: #21464f;
+}
+
+[data-card-theme="blue"] {
+    --gradient-end: #2c266f;
+    --attribute-block: #2a2965;
+}
+
+[data-card-theme="red"] {
+    --gradient-end: #36193a;
+    --attribute-block: #3e2849;
+}
+
+/* Additional theme-specific variables */
+:root:has([data-theme="green"]),
+[data-component-theme="green"] {
+    --highlight-start: 140 250 159;
+    --highlight-end: 140 250 159;
+    --circle-left: #6a8d89;
+    --circle-right: #487c57;
+    --profile-banner: url("/banner-green.png");
+    --btn-shadow-color: rgba(197, 233, 118, 0.6);
+}
+
+:root:has([data-theme="blue"]),
+[data-component-theme="blue"] {
+    --highlight-start: 72 142 255;
+    --highlight-end: 50 59 193;
+    --circle-left: #4755d0;
+    --circle-right: #3a75ea;
+    --profile-banner: url("/banner-blue.png");
+    --btn-shadow-color: rgba(145, 118, 233, 0.6);
+}
+
+:root:has([data-theme="red"]),
+[data-component-theme="red"] {
+    --highlight-start: 102 43 82;
+    --highlight-end: 103 149 201;
+    --circle-left: #405684;
+    --circle-right: #405684;
+    --profile-banner: url("/banner-red.png");
+    --btn-shadow-color: rgba(145, 118, 233, 0.6);
+}
