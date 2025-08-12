@@ -9,7 +9,7 @@ export const OrderSummary: React.FC<{ buyer: BuyerData }> = ({ buyer }) => {
       <SmallProfile buyer={buyer} />
       <div className="flex gap-5 justify-between text-sm">
         <div>Total（Tax Included）</div>
-        <div>$3,030 NTD</div>
+        <div>$3,000 NTD</div>
       </div>
       <Hr className="w-full my-5 h-px border-none bg-[rgba(19,19,20,0.20)]" />
     </>
