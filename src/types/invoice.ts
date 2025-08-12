@@ -18,7 +18,7 @@ export interface InvoiceData {
 export interface InvoiceUpdateResponse {
   success: boolean;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 /**

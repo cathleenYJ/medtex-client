@@ -22,7 +22,7 @@ export const Sidebar: React.FC<{ className?: string }> = ({ className }) => {
     {
       label: "Dashboards",
       items: [
-        { label: "Overview", href: "/admin" },
+        // { label: "Overview", href: "/admin" },
         { label: "Registration Record", href: "/admin/registration-record" },
         { label: "Payment History", href: "/admin/payment-history" },
       ]

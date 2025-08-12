@@ -63,12 +63,12 @@ export const ConfigValue = {
   },
   PRIVILEGES: {
     buyer: {
-      admin: Routes.private.admin,
+      // admin: Routes.private.registrationForm,
       // matchmaking: Routes.private.matchmaking,
       // appointments: Routes.private.appointments,
     },
     seller: {
-      admin: Routes.private.admin,
+      // admin: Routes.private.registrationForm,
       // matchmaking: Routes.private.matchmaking,
       // appointments: Routes.private.appointments,
       // wishlist: Routes.private.wishlist,

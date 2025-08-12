@@ -18,7 +18,7 @@ export const UserInfo: React.FC<{ close: () => void }> = ({ close }) => {
         <Button
           variant="userinfo"
           component={Link}
-          href={Routes.private.admin}
+          href={Routes.private.registrationRecord}
           onClick={close}
         >
           <Content icon={PresentationChartBarIcon} text="Admin" />

@@ -19,7 +19,7 @@ export const PaymentCompleted: React.FC<{ children?: React.ReactNode }> = ({
         </Button>
         <Button
           component={Link}
-          href={Routes.private.admin}
+          href={Routes.private.registrationRecord}
           variant="auth"
           style={{
             minWidth: "200px",

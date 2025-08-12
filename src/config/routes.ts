@@ -19,9 +19,9 @@ export const Routes = {
   },
   private: {
     admin: "/admin",
-    // matchmaking: "/admin/matchmaking",
-    // appointments: "/admin/appointments",
-    // wishlist: "/admin/wishlist",
+    matchmaking: "/admin/matchmaking",
+    appointments: "/admin/appointments",
+    wishlist: "/admin/wishlist",
     registrationRecord: "/admin/registration-record",
     paymentHistory: "/admin/payment-history",
     profile: "/admin/profile",

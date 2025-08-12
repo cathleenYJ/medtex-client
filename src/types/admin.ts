@@ -67,9 +67,21 @@ export type DialogProfile = {
   theme: string;
   logo: string;
   company_name: string;
-  business_nature: Record<string, string>;
-  address: string;
-  website: string;
+  business_nature: Record<string, string> | null;
+  address?: string;
+  website?: string;
+  // Contact information
+  user_name: string;
+  job_title: string;
+  timezone?: string;
+  // Business information
+  business_capital_amount?: string;
+  purchasing_requirement?: Record<string, string>;
+  headquarter_location?: string;
+  required_certification?: Record<string, string>;
+  company_website?: string;
+  product_url?: string[] | null;
+  business_annual_revenue?: string;
 };
 
 // Order Meeting Details API Types

@@ -6,7 +6,7 @@ interface LinkWithMeetingIdProps {
   href: string;
   children: React.ReactNode;
   className?: string;
-  [key: string]: any; // 允許其他 Link 組件的 props
+  [key: string]: unknown; // 允許其他 Link 組件的 props
 }
 
 /**

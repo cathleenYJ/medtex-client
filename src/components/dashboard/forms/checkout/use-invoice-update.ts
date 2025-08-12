@@ -1,13 +1,12 @@
 "use client";
 
 import * as z from "zod/v4";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { SubmitHandler } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { fetchData } from "@/data/fetch-data";
 import { CheckoutSchema } from "./state";
-import type { InvoiceData, InvoiceFormData } from "@/types";
+import type { InvoiceData } from "@/types";
 
 /**
  * Custom hook for updating invoice information
@@ -16,7 +15,6 @@ import type { InvoiceData, InvoiceFormData } from "@/types";
  * @returns Object containing isPending state, updateInvoice function, and success callback setter
  */
 export const useInvoiceUpdate = () => {
-  const router = useRouter();
   const { data: session } = useSession();
   
   const { mutate: updateInvoiceInfo, isPending } = useMutation({

@@ -9,7 +9,7 @@ import { fetchData } from "@/data/fetch-data";
 import { Routes } from "@/config/routes";
 import { useCurrentRequest } from "@/hooks/use-current-request";
 import { RegistrationFormSchema } from "./state";
-import type { ParticipantData, RegistrationFormData } from "@/types";
+import type { ParticipantData, BuyerData } from "@/types";
 
 /**
  * Custom hook for updating participant information
@@ -74,7 +74,7 @@ export const useParticipantUpdate = () => {
         accountType,
         dietaryPreferences: data.dietaryPreferences?.name || "Regular meal",
         meeting_id: 41 // Temporary ID, should come from API response
-      } as any,
+      } as unknown as BuyerData,
       appId: 863 // Temporary ID, should come from API response
     });
 

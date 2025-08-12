@@ -44,13 +44,13 @@ export default function PaymentHistoryPage() {
       return [];
     }
     
-    const { orders, meeting_details, payment_history, participant_details } = meetingDetailsData.data;
+    const { orders, meeting_details, payment_history } = meetingDetailsData.data;
     console.log("Payment History data:", meetingDetailsData.data);
     
     // 為每個訂單創建一個付款記錄
     return orders
       .filter((order) => order.merchant_trade_no) // 只顯示有 merchant_trade_no 的記錄
-      .map((order, index) => {
+      .map((order) => {
         // 找到對應的付款記錄
         const paymentInfo = payment_history.find(payment => payment.order_id === order.id);
         

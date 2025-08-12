@@ -1,5 +1,6 @@
 "use client";
 
+import * as z from "zod/v4";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -38,7 +39,7 @@ export const Step1: React.FC<Step1Props> = ({
   const [isFormReady, setIsFormReady] = useState(false);
 
   // Fetch profile data to prefill form
-  const { data: profileData, isLoading, error } = useQuery({
+  const { data: profileData, isLoading } = useQuery({
     queryKey: ["profile-data"],
     queryFn: () => fetchData.sellers.getProfileData(session),
     enabled: !!session?.user.adminToken,
@@ -85,7 +86,7 @@ export const Step1: React.FC<Step1Props> = ({
   const buttonText = isEditMode ? 'Save' : 'Continue';
 
   // 根據模式調整提交後的行為
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: z.infer<typeof RegistrationFormSchema>) => {
     console.log("Form data received:", data);
     console.log("Company Name:", `'${data.companyName}'`);
     console.log("Company Name Chinese:", `'${data.companyNameChinese}'`);
@@ -248,7 +249,7 @@ export const Step1: React.FC<Step1Props> = ({
               },
             ],
           },
-        ] as any}
+        ] as Array<Record<string, unknown>>}
       >
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
           <div className="flex items-center justify-center sm:justify-start gap-2">

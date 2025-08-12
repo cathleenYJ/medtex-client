@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { fetchData } from "@/data/fetch-data";
 import { Routes } from "@/config/routes";
 import { ProfileFormSchema } from "./state";
-import type { ProfileData, ProfileFormData } from "@/types";
+import type { ProfileData } from "@/types";
 
 /**
  * Custom hook for updating user profile information

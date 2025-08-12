@@ -1,10 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { signIn, useSession } from "next-auth/react";
-import { Button } from "@ui/button";
-import { useModal } from "@modals/context";
-import { ConfirmMeetingRequest } from "@modals/views";
+import { useSession } from "next-auth/react";
 import { ConfigValue } from "@/config";
 import { headerSans } from "@/styles/font";
 import type { BuyerData } from "@/types";

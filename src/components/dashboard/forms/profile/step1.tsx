@@ -136,11 +136,6 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
       schema = ProfileFormSchema;
     }
     
-    // Debug: Test validation with current defaultValues
-    if (selectedType) {
-      const validationResult = schema.safeParse(defaultValues);
-    }
-    
     return schema;
   };
 
@@ -324,8 +319,8 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
               },
             ],
           },
-        ] as any),
-      ] as any}
+        ] as Array<Record<string, unknown>>),
+      ] as Array<Record<string, unknown>>}
     >
       <Confirm cancelClick={() => router.back()}>
         <Button

@@ -12,7 +12,7 @@ export default async function SignInPage({
   const search = await searchParams;
   const session = await auth();
   if (session) {
-    redirect(search?.callbackUrl ?? Routes.private.admin);
+    redirect(search?.callbackUrl ?? Routes.private.registrationRecord);
   }
   return (
     <div className="flex flex-col items-center w-full">
@@ -24,7 +24,7 @@ export default async function SignInPage({
           <div className="w-full flex justify-center">
             <div className="h-px bg-[#13131433] w-full max-w-90 sm:max-w-[480px]" />
           </div>
-          <CredentialsSignin redirectTo={search?.callbackUrl ?? Routes.private.admin} />
+          <CredentialsSignin redirectTo={search?.callbackUrl ?? Routes.private.registrationRecord} />
         </div>
   );
 }
