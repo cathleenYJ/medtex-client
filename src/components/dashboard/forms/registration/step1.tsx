@@ -27,7 +27,7 @@ export const Step1: React.FC<Step1Props> = ({
   const router = useRouter();
   const [defaultValues, setDefaultValues] = useState({
     contactPhoneCode: { id: "TW", name: "886" },
-    dietaryPreferences: { id: "regular", name: "Regular meal" },
+    dietaryPreferences: { id: "regular", name: "Regular" },
     firstName: "",
     lastName: "",
     emailAddress: "",
@@ -56,7 +56,7 @@ export const Step1: React.FC<Step1Props> = ({
       
       const newValues = {
         contactPhoneCode: { id: "TW", name: "886" },
-        dietaryPreferences: { id: "regular", name: "Regular meal" },
+        dietaryPreferences: { id: "regular", name: "Regular" },
         // 優先使用 participant_info，沒有值時使用 profile_info
         firstName: participant_info?.participant_first_name || profile_info?.first_name || "",
         lastName: participant_info?.participant_last_name || profile_info?.last_name || "",
@@ -105,7 +105,7 @@ export const Step1: React.FC<Step1Props> = ({
           job_title: data.jobTitle,
           mobile_number: data.mobileNumber,
           participant_email: data.emailAddress,
-          dietary_preferences: data.dietaryPreferences?.name || "Regular meal",
+          dietary_preferences: data.dietaryPreferences?.name || "Regular",
         };
         
         // 只有當公司名稱有值時才加入 API 資料
@@ -243,8 +243,8 @@ export const Step1: React.FC<Step1Props> = ({
                 placeholder: "Select dietary preference",
                 className: "w-full",
                 items: [
-                  { id: "regular", name: "Regular meal" },
-                  { id: "vegetarian", name: "Vegetarian meal" },
+                  { id: "regular", name: "Regular" },
+                  { id: "vegetarian", name: "Vegetarian" },
                 ],
               },
             ],

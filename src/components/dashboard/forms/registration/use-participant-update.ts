@@ -49,7 +49,7 @@ export const useParticipantUpdate = () => {
       job_title: data.jobTitle,
       mobile_number: data.mobileNumber,
       participant_email: data.emailAddress,
-      dietary_preferences: data.dietaryPreferences?.name || "Regular meal",
+      dietary_preferences: data.dietaryPreferences?.name || "Regular",
     };
     
     // Add company name fields if they have values
@@ -72,7 +72,7 @@ export const useParticipantUpdate = () => {
         mobile: data.mobileNumber,
         jobTitle: data.jobTitle,
         accountType,
-        dietaryPreferences: data.dietaryPreferences?.name || "Regular meal",
+        dietaryPreferences: data.dietaryPreferences?.name || "Regular",
         meeting_id: 41 // Temporary ID, should come from API response
       } as unknown as BuyerData,
       appId: 863 // Temporary ID, should come from API response
