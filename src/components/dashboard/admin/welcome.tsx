@@ -22,8 +22,6 @@ export const Welcome: React.FC = () => {
 
 const welcomeText = (pathname: string) => {
   switch (pathname) {
-    case Routes.private.registrationRecord:
-      return "Welcome back,";
     case Routes.private.matchmaking:
       return "Matchmaking";
     case Routes.private.appointments:

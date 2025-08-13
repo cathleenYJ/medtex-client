@@ -5,14 +5,14 @@ interface EventInfoProps {
   eventName: string;
   startTime?: string; // 完整的日期時間字符串，格式：2025-12-05 10:00:00
   endTime?: string;   // 完整的日期時間字符串，格式：2025-12-05 11:00:00
-  location?: string;
+  meeting_address?: string;
 }
 
 export const EventInfo: React.FC<EventInfoProps> = ({
   eventName,
   startTime,
   endTime,
-  location = "南港展覽館 1館 4樓南港展覽館 1館 4樓"
+  meeting_address
 }) => {
   const formatDateTime = () => {
     if (!startTime || !endTime) {
@@ -57,16 +57,16 @@ export const EventInfo: React.FC<EventInfoProps> = ({
 
   return (
     <div className="flex-1 space-y-2 sm:order-2 order-2">
-      <div className="text-medtex-blue text-lg font-bold leading-[30px]">
+      <div className="text-medtex-blue font-bold leading-[30px] sm:text-lg text-base">
         {eventName}
       </div>
-      <div className="flex sm:items-center items-start gap-2 text-medtex-blue text-base leading-7">
+      <div className="flex sm:items-center items-start gap-2 text-medtex-blue leading-7 sm:text-base text-sm">
         <CalendarIcon className="flex-shrink-0 sm:mt-0 mt-1" />
         <span className="break-words">{formatDateTime()}</span>
       </div>
-      <div className="flex sm:items-center items-start gap-2 text-medtex-blue text-base leading-7">
+      <div className="flex sm:items-center items-start gap-2 text-medtex-blue leading-7 sm:text-base text-sm">
         <LocationIcon className="flex-shrink-0 sm:mt-0 mt-1" />
-        <span className="break-words">{location}</span>
+        <span className="break-words">{meeting_address}</span>
       </div>
     </div>
   );

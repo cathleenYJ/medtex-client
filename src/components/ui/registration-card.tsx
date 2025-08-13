@@ -67,14 +67,15 @@ export const RegistrationCard: React.FC<RegistrationCardProps> = ({ data }) => {
       <div className="flex sm:flex-row flex-col w-full sm:items-center items-start sm:gap-6 gap-4">
         {/* 左側圖片 */}
         <div className="flex-shrink-0 sm:order-1 order-1">
-          <MedtexLogo />
+          <MedtexLogo className="sm:w-[86px] sm:h-[86px] w-[42px] h-[42px]" />
         </div>
 
         {/* 中間活動資訊 */}
         <EventInfo 
-          eventName={data.meeting_title || ""}
+          eventName={data.meeting_title || "-"}
           startTime={data.start_time}
           endTime={data.end_time}
+          meeting_address={data.meeting_address || "-"}
         />
 
         {/* 右側按鈕區域 */}
