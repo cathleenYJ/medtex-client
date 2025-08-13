@@ -38,12 +38,22 @@ export default function RegistrationRecordPage() {
       ? meetingDetailsData.data
       : [meetingDetailsData.data];
 
-    let allItems: RegistrationTable[] = [];
+    const allItems: RegistrationTable[] = [];
     let globalIndex = 0;
-    dataArray.forEach((meetingBlock: any) => {
-      const { orders, meeting_details, payment_history, participant_details } = meetingBlock;
-      orders.forEach((order: any) => {
-        const paymentInfo = payment_history.find((payment: any) => payment.order_id === order.id);
+    dataArray.forEach((meetingBlock) => {
+      const { orders, meeting_details, payment_history, participant_details } = meetingBlock as {
+        orders: Array<{ id: number; status: string; amount: number; merchant_trade_no?: string }>;
+        meeting_details: { start_time: string; end_time: string; title: string; address: string };
+        payment_history: Array<{ order_id: number; invoice_date?: number; invoice_number?: string }>;
+        participant_details: {
+          participant_full_name: string;
+          job_title: string;
+          mobile_number?: string;
+          participant_email: string;
+        };
+      };
+      orders.forEach((order) => {
+        const paymentInfo = payment_history.find((payment) => payment.order_id === order.id);
         const startDateTime = new Date(meeting_details.start_time);
         const meetingDate = startDateTime.toISOString().split('T')[0];
         let registrationDate = meetingDate;

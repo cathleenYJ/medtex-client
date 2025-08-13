@@ -25,7 +25,7 @@ export const useParticipantUpdate = () => {
   const { mutate: updateParticipantInfo, isPending } = useMutation({
     mutationKey: ["update-participant-info"],
     mutationFn: (data: ParticipantData) => fetchData.sellers.participantInfoUpdate(data, session),
-    onSuccess: (response) => {
+    onSuccess: () => {
       // Navigate to checkout form after successful update
       router.push(`${Routes.private.checkoutForm}/1`);
     },

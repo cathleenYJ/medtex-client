@@ -24,7 +24,7 @@ export const useProfileUpdate = (selectedType: "personal" | "corporate" | null, 
   const { mutate: updateProfileInfo, isPending } = useMutation({
     mutationKey: ["update-profile-info"],
     mutationFn: (data: ProfileData) => fetchData.sellers.profileInfoUpdate(data, session),
-    onSuccess: (response) => {
+    onSuccess: () => {
       // Navigate to registration form step 1
       router.push(`${Routes.private.profileForm}/${step + 1}`)
     },

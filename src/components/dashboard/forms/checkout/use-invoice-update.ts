@@ -20,7 +20,7 @@ export const useInvoiceUpdate = () => {
   const { mutate: updateInvoiceInfo, isPending } = useMutation({
     mutationKey: ["update-invoice-info"],
     mutationFn: (data: InvoiceData) => fetchData.sellers.invoiceInfoUpdate(data, session),
-    onSuccess: (response) => {
+    onSuccess: () => {
       // You can add success handling here (e.g., show success message)
     },
     onError: (error) => {

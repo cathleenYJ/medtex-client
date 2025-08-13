@@ -45,13 +45,17 @@ export default function PaymentHistoryPage() {
       ? meetingDetailsData.data
       : [meetingDetailsData.data];
 
-    let allItems: PaymentTable[] = [];
-    dataArray.forEach((meetingBlock: any) => {
-      const { orders, meeting_details, payment_history } = meetingBlock;
+    const allItems: PaymentTable[] = [];
+    dataArray.forEach((meetingBlock) => {
+      const { orders, meeting_details, payment_history } = meetingBlock as {
+        orders: Array<{ merchant_trade_no?: string; id: number; status: string; amount: number }>;
+        meeting_details: { title: string };
+        payment_history: Array<{ order_id: number; invoice_date?: number; invoice_number?: string }>;
+      };
       orders
-        .filter((order: any) => order.merchant_trade_no)
-        .forEach((order: any) => {
-          const paymentInfo = payment_history.find((payment: any) => payment.order_id === order.id);
+        .filter((order) => order.merchant_trade_no)
+        .forEach((order) => {
+          const paymentInfo = payment_history.find((payment) => payment.order_id === order.id);
           let registrationDate = "-";
           if (paymentInfo?.invoice_date) {
             const invoiceDate = new Date(paymentInfo.invoice_date * 1000);
@@ -90,9 +94,9 @@ export default function PaymentHistoryPage() {
     if (Array.isArray(node)) {
       return node.map(getString).join(' ');
     }
-    // @ts-ignore
+    // @ts-expect-error ReactNode type detection for ExternalLink children
     if (node && typeof node === 'object' && node.type && node.props) {
-      // @ts-ignore
+      // @ts-expect-error ReactNode type detection for ExternalLink children
       return getString(node.props.children);
     }
     return '';
