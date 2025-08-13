@@ -24,100 +24,94 @@ export default function PaymentHistoryPage() {
   const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
   
-  // Get meeting_id from URL parameters (same as RegistrationRecordPage)
+  // 參考 registration-record，支援單一/多個 meetingId
   const { getMeetingIdAsNumber } = useMeetingId();
   const meetingId = getMeetingIdAsNumber();
-  
-  // 獲取單一會議的詳細資料 (與 RegistrationRecordPage 共用同一套邏輯)
+  const safeMeetingId = meetingId ?? 0;
+
   const { data: meetingDetailsData, isLoading: isMeetingDetailsLoading } = useQuery({
     queryKey: ["meeting-details", meetingId],
-    queryFn: () => {
-      if (!meetingId) throw new Error("No meeting ID provided");
-      return fetchData.admin.orderMeetingDetails(meetingId, session);
-    },
-    enabled: !!session?.user.adminToken && !!meetingId,
+    queryFn: () => fetchData.admin.orderMeetingDetails(safeMeetingId, session),
+    enabled: !!session?.user.adminToken,
   });
 
-  // 轉換 API 資料為 PaymentTable 格式 (參考 RegistrationRecordPage 的邏輯)
+  // 轉換 API 資料為 PaymentTable 格式 (支援多會議/單一會議)
   const paymentData: PaymentTable[] = useMemo(() => {
     if (!meetingDetailsData || meetingDetailsData.status !== "retrieved" || !meetingDetailsData.data) {
       return [];
     }
-    
-    const { orders, meeting_details, payment_history } = meetingDetailsData.data;
-    console.log("Payment History data:", meetingDetailsData.data);
-    
-    // 為每個訂單創建一個付款記錄
-    return orders
-      .filter((order) => order.merchant_trade_no) // 只顯示有 merchant_trade_no 的記錄
-      .map((order) => {
-        // 找到對應的付款記錄
-        const paymentInfo = payment_history.find(payment => payment.order_id === order.id);
-        
-        // 使用 invoice_date 作為 registration_date，如果沒有則使用訂單創建時間
-        let registrationDate = "-";
-        
-        if (paymentInfo?.invoice_date) {
-          const invoiceDate = new Date(paymentInfo.invoice_date * 1000); // Unix timestamp to Date
-          // 格式: 2025/12/4 13:00
-          const year = invoiceDate.getFullYear();
-          const month = invoiceDate.getMonth() + 1; // getMonth() returns 0-11
-          const day = invoiceDate.getDate();
-          const hours = invoiceDate.getHours().toString().padStart(2, '0');
-          const minutes = invoiceDate.getMinutes().toString().padStart(2, '0');
-          
-          registrationDate = `${year}/${month}/${day} ${hours}:${minutes}`;
-        }
-        
-        // 將狀態首字母大寫
-        const capitalizeStatus = (status: string) => {
-          return status.charAt(0).toUpperCase() + status.slice(1);
-        };
-        
-        const paymentItem: PaymentTable = {
-          no: order.merchant_trade_no, // 直接使用 merchant_trade_no（已確保存在）
-          event_name: <ExternalLink onClick={() => {}}>{meeting_details.title}</ExternalLink>,
-          registration_date: registrationDate,
-          payment_status: capitalizeStatus(order.status), // 首字母大寫的狀態
-          amount_paid: `NT$${order.amount}`,
-          invoice: paymentInfo?.invoice_number || "Pending",
-          note: order.status === "fail" ? "付款失敗" : "-",
-        };
-        
-        return paymentItem;
-      });
+    // 支援 data 為 array（多會議）或 object（單一會議）
+    const dataArray = Array.isArray(meetingDetailsData.data)
+      ? meetingDetailsData.data
+      : [meetingDetailsData.data];
+
+    let allItems: PaymentTable[] = [];
+    dataArray.forEach((meetingBlock: any) => {
+      const { orders, meeting_details, payment_history } = meetingBlock;
+      orders
+        .filter((order: any) => order.merchant_trade_no)
+        .forEach((order: any) => {
+          const paymentInfo = payment_history.find((payment: any) => payment.order_id === order.id);
+          let registrationDate = "-";
+          if (paymentInfo?.invoice_date) {
+            const invoiceDate = new Date(paymentInfo.invoice_date * 1000);
+            const year = invoiceDate.getFullYear();
+            const month = invoiceDate.getMonth() + 1;
+            const day = invoiceDate.getDate();
+            const hours = invoiceDate.getHours().toString().padStart(2, '0');
+            const minutes = invoiceDate.getMinutes().toString().padStart(2, '0');
+            registrationDate = `${year}/${month}/${day} ${hours}:${minutes}`;
+          }
+          const capitalizeStatus = (status: string) => {
+            return status.charAt(0).toUpperCase() + status.slice(1);
+          };
+          const paymentItem: PaymentTable = {
+            no: order.merchant_trade_no,
+            event_name: <ExternalLink onClick={() => {}}>{meeting_details.title}</ExternalLink>,
+            registration_date: registrationDate,
+            payment_status: capitalizeStatus(order.status),
+            amount_paid: `NT$${order.amount}`,
+            invoice: paymentInfo?.invoice_number || "Pending",
+            note: order.status === "fail" ? "付款失敗" : "-",
+          };
+          allItems.push(paymentItem);
+        });
+    });
+    return allItems;
   }, [meetingDetailsData]);
 
   const isLoading = isMeetingDetailsLoading;
   // 過濾資料根據搜尋條件
+  // 支援 ReactNode 轉字串（element/array/children）
+  const getString = (node: React.ReactNode): string => {
+    if (typeof node === 'string' || typeof node === 'number') {
+      return String(node);
+    }
+    if (Array.isArray(node)) {
+      return node.map(getString).join(' ');
+    }
+    // @ts-ignore
+    if (node && typeof node === 'object' && node.type && node.props) {
+      // @ts-ignore
+      return getString(node.props.children);
+    }
+    return '';
+  };
+
   const filteredData = paymentData?.filter((item) => {
     if (!searchTerm) return true;
-    
     const searchLower = searchTerm.toLowerCase();
-    
-    // 將 ReactNode 轉換為字串進行搜尋
-    const getString = (node: React.ReactNode): string => {
-      if (typeof node === 'string' || typeof node === 'number') {
-        return String(node);
-      }
-      return "";
-    };
-    
-    const eventName = getString(item.event_name);
-    const paymentStatus = getString(item.payment_status);
-    const invoice = getString(item.invoice);
-    const amountPaid = getString(item.amount_paid);
-    const note = getString(item.note);
-    const registrationDate = getString(item.registration_date);
-    
-    return (
-      eventName.toLowerCase().includes(searchLower) ||
-      paymentStatus.toLowerCase().includes(searchLower) ||
-      invoice.toLowerCase().includes(searchLower) ||
-      amountPaid.toLowerCase().includes(searchLower) ||
-      note.toLowerCase().includes(searchLower) ||
-      registrationDate.toLowerCase().includes(searchLower)
-    );
+    // 將所有欄位合併成一個字串
+    const allText = [
+      item.no,
+      item.event_name,
+      item.registration_date,
+      item.payment_status,
+      item.amount_paid,
+      item.invoice,
+      item.note
+    ].map(getString).join(' ').toLowerCase();
+    return allText.includes(searchLower);
   });
 
   return (

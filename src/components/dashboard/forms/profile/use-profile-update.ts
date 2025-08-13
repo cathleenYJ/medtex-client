@@ -25,7 +25,6 @@ export const useProfileUpdate = (selectedType: "personal" | "corporate" | null, 
     mutationKey: ["update-profile-info"],
     mutationFn: (data: ProfileData) => fetchData.sellers.profileInfoUpdate(data, session),
     onSuccess: (response) => {
-      console.log("Profile updated successfully:", response);
       // Navigate to registration form step 1
       router.push(`${Routes.private.profileForm}/${step + 1}`)
     },
@@ -57,8 +56,6 @@ export const useProfileUpdate = (selectedType: "personal" | "corporate" | null, 
       if (data.businessId) apiData.business_id = data.businessId;
       if (data.companyAddress) apiData.company_address = data.companyAddress;
     }
-
-    console.log("Sending API data:", apiData);
     updateProfileInfo(apiData);
   };
 

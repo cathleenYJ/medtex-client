@@ -26,7 +26,6 @@ export const useParticipantUpdate = () => {
     mutationKey: ["update-participant-info"],
     mutationFn: (data: ParticipantData) => fetchData.sellers.participantInfoUpdate(data, session),
     onSuccess: (response) => {
-      console.log("Participant info updated successfully:", response);
       // Navigate to checkout form after successful update
       router.push(`${Routes.private.checkoutForm}/1`);
     },
@@ -60,8 +59,6 @@ export const useParticipantUpdate = () => {
     if (data.companyNameChinese && data.companyNameChinese.trim() !== '') {
       apiData.participant_company_name_zh = data.companyNameChinese;
     }
-
-    console.log("Sending participant API data:", apiData);
     
     // Set registration data for checkout (keep existing logic for compatibility)
     setCurrentRequest({

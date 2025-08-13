@@ -1,5 +1,5 @@
 import React from "react";
-import { QRCodeIcon } from "@/components/icons";
+import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 
 interface ActionButtonProps {
@@ -27,8 +27,11 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         className="flex sm:p-1.5 sm:px-2.5 p-[6px] px-[10px] justify-center items-center sm:gap-2.5 gap-[10px] rounded-md border border-medtex-gray bg-white hover:bg-gray-50 transition-colors sm:w-auto sm:h-auto sm:flex-none flex-1 h-10"
       >
         <div className="flex items-center gap-2">
-          <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+          {/* <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
             <QRCodeIcon />
+          </div> */}
+          <div className="w-[32px] h-[32px] flex-shrink-0 aspect-square bg-gray-100 rounded flex items-center justify-center self-center">
+            <QRCode value={ticketNumber || ''} size={32} />
           </div>
           <div className="flex flex-col items-start">
             <span className="text-[#9E9EAB] font-normal text-sm leading-5">

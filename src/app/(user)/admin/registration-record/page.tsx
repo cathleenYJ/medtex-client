@@ -20,15 +20,12 @@ export default function RegistrationRecordPage() {
   // Get meeting_id from URL parameters (same as checkout step1)
   const { getMeetingIdAsNumber } = useMeetingId();
   const meetingId = getMeetingIdAsNumber();
-  
-  // 獲取單一會議的詳細資料
+  const safeMeetingId = meetingId ?? 0;
+
   const { data: meetingDetailsData, isLoading: isMeetingDetailsLoading } = useQuery({
     queryKey: ["meeting-details", meetingId],
-    queryFn: () => {
-      if (!meetingId) throw new Error("No meeting ID provided");
-      return fetchData.admin.orderMeetingDetails(meetingId, session);
-    },
-    enabled: !!session?.user.adminToken && !!meetingId,
+    queryFn: () => fetchData.admin.orderMeetingDetails(safeMeetingId, session),
+    enabled: !!session?.user.adminToken,
   });
 
   // 轉換 API 資料為 RegistrationCardData 格式
@@ -36,82 +33,73 @@ export default function RegistrationRecordPage() {
     if (!meetingDetailsData || meetingDetailsData.status !== "retrieved" || !meetingDetailsData.data) {
       return [];
     }
-    
-    const { orders, meeting_details, payment_history, participant_details } = meetingDetailsData.data;
-    console.log("Meeting details data:", meetingDetailsData.data);
-    
-    // 為每個訂單創建一個註冊記錄
-    return orders.map((order, index) => {
-      // 找到對應的付款記錄
-      const paymentInfo = payment_history.find(payment => payment.order_id === order.id);
-      
-      // 解析會議日期用於 registration_date
-      const startDateTime = new Date(meeting_details.start_time);
-      const meetingDate = startDateTime.toISOString().split('T')[0]; // YYYY-MM-DD
-      
-      // 使用 invoice_date 作為 registration_date，如果沒有則使用會議日期
-      let registrationDate = meetingDate; // 預設使用會議日期
-      let registerTime = "-"; // 預設值
-      
-      if (paymentInfo?.invoice_date) {
-        const invoiceDate = new Date(paymentInfo.invoice_date * 1000); // Unix timestamp to Date
-        registrationDate = invoiceDate.toISOString().split('T')[0]; // YYYY-MM-DD
-        registerTime = invoiceDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-      }
-      
-      // 決定狀態 - 根據可能的狀態值：'pending','paying','paid','fail'
-      let isRegistered = false;
-      let isPaymentComplete = false;
-      
-      if (order.status === "paid") {
-        isRegistered = true;
-        isPaymentComplete = true;
-      } else if (order.status === "pending" || order.status === "paying") {
-        isRegistered = true;
-        isPaymentComplete = false;
-      } else if (order.status === "fail") {
-        isRegistered = true;
-        isPaymentComplete = false;
-      }
-      
-      // 將狀態首字母大寫
-      const capitalizeStatus = (status: string) => {
-        return status.charAt(0).toUpperCase() + status.slice(1);
-      };
-      
-      const registrationItem: RegistrationTable = {
-        no: index + 1,
-        event_name: <ExternalLink onClick={() => {}}>{meeting_details.title}</ExternalLink>,
-        registration_date: registrationDate,
-        start_time: meeting_details.start_time, // 傳入完整的日期時間字符串
-        end_time: meeting_details.end_time,     // 傳入完整的日期時間字符串
-        status: capitalizeStatus(order.status), // 首字母大寫的狀態
-        participant_name: participant_details.participant_full_name,
-        company: "-", // API 沒有提供公司資訊
-        note: order.status === "fail" ? "付款失敗" : "-",
-        price: `NT$${order.amount}`,
-        invoice: paymentInfo?.invoice_number || "Pending",
-        job_position: participant_details.job_title,
-        mobile: participant_details.mobile_number || "-",
-        email: participant_details.participant_email,
-        register_time: registerTime,
-        // 移除 dietary 欄位
-        is_registered: isRegistered,
-        is_payment_complete: isPaymentComplete,
-        ticket_number: order.merchant_trade_no || `Order-${order.id}`,
-        // 加入會議詳細資訊供 EventInfo 使用
-        meeting_title: meeting_details.title,
-        meeting_address: meeting_details.address,
-      };
-      
-      return registrationItem;
+    // 支援 data 為 array（多會議）或 object（單一會議）
+    const dataArray = Array.isArray(meetingDetailsData.data)
+      ? meetingDetailsData.data
+      : [meetingDetailsData.data];
+
+    let allItems: RegistrationTable[] = [];
+    let globalIndex = 0;
+    dataArray.forEach((meetingBlock: any) => {
+      const { orders, meeting_details, payment_history, participant_details } = meetingBlock;
+      orders.forEach((order: any) => {
+        const paymentInfo = payment_history.find((payment: any) => payment.order_id === order.id);
+        const startDateTime = new Date(meeting_details.start_time);
+        const meetingDate = startDateTime.toISOString().split('T')[0];
+        let registrationDate = meetingDate;
+        let registerTime = "-";
+        if (paymentInfo?.invoice_date) {
+          const invoiceDate = new Date(paymentInfo.invoice_date * 1000);
+          registrationDate = invoiceDate.toISOString().split('T')[0];
+          registerTime = invoiceDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
+        let isRegistered = false;
+        let isPaymentComplete = false;
+        if (order.status === "paid") {
+          isRegistered = true;
+          isPaymentComplete = true;
+        } else if (order.status === "pending" || order.status === "paying") {
+          isRegistered = true;
+          isPaymentComplete = false;
+        } else if (order.status === "fail") {
+          isRegistered = true;
+          isPaymentComplete = false;
+        }
+        const capitalizeStatus = (status: string) => {
+          return status.charAt(0).toUpperCase() + status.slice(1);
+        };
+        const registrationItem: RegistrationTable = {
+          no: ++globalIndex,
+          event_name: <ExternalLink onClick={() => {}}>{meeting_details.title}</ExternalLink>,
+          registration_date: registrationDate,
+          start_time: meeting_details.start_time,
+          end_time: meeting_details.end_time,
+          status: capitalizeStatus(order.status),
+          participant_name: participant_details.participant_full_name,
+          company: "-",
+          note: order.status === "fail" ? "付款失敗" : "-",
+          price: `NT$${order.amount}`,
+          invoice: paymentInfo?.invoice_number || "Pending",
+          job_position: participant_details.job_title,
+          mobile: participant_details.mobile_number || "-",
+          email: participant_details.participant_email,
+          register_time: registerTime,
+          is_registered: isRegistered,
+          is_payment_complete: isPaymentComplete,
+          ticket_number: order.merchant_trade_no || `-`,
+          meeting_title: meeting_details.title,
+          meeting_address: meeting_details.address,
+        };
+        allItems.push(registrationItem);
+      });
     });
+    return allItems;
   }, [meetingDetailsData]);
 
   const isLoading = isMeetingDetailsLoading;

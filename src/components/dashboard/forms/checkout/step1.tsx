@@ -23,6 +23,7 @@ import { OrderSummary } from "./order-summary";
 import { ECPaySubmit } from "./ecpay-submit";
 import { PaymentConfirm } from "./payment-confirm";
 import { useInvoiceUpdate } from "./use-invoice-update";
+import { LoadingBlock } from "@dashboard/loading-block";
 
 export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
   const {
@@ -86,7 +87,6 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
   
   // Use the invoice update hook instead of payment mutation
   const { isPending: isInvoiceUpdating, updateInvoice } = useInvoiceUpdate();
-  
   // Add mutation for AUTH_CHECKOUT API
   const { isPending: isCheckoutPending, mutate: callCheckoutAPI } = useMutation({
     mutationKey: ["auth-checkout"],
@@ -106,7 +106,6 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
       );
     },
   });
-  
   // Keep the payment mutation for making payment after checkout
   const { isPending: isPaymentPending, mutate: makePaymentMutation } = useMutation({
     mutationKey: ["checkout"],
@@ -258,6 +257,15 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     );
   }, [shouldShowError]);
 
+  // Show loading block while waiting for all data to be ready
+  if (isProfileLoading || !isFormReady) {
+    return (
+      <div className="w-7xl max-w-full flex flex-col gap-5 text-black">
+        <LoadingBlock />
+      </div>
+    );
+  }
+
   return (
     <div
       className={clsx(
@@ -267,67 +275,65 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     >
       <StepInfo title="Checkout" />
       <div className="flex sm:gap-15 flex-col sm:flex-row">
-        {/* Only render form when ready */}
-        {isFormReady && (
-          <Form
-            key={`checkout-${defaultValues.tax_email}-${defaultValues.tax_title}-${defaultValues.tax_id}`} // Force re-render when data changes
-            className="flex flex-col gap-5 basis-full sm:basis-1/2 text-black/80"
-            onSubmit={handleFormSubmit}
-            schema={CheckoutSchema}
-            defaultValues={defaultValues}
-          fieldsGroups={[
-            {
-              children: (
-                <div className="text-xl text-black font-medium">Invoice</div>
-              ),
-            },
-            {
-              label: "＊ Invoice Email Address",
-              className: "basis-full [&_[data-labels]]:flex-wrap",
-              fields: [
-                {
-                  name: "tax_email",
-                  type: "text",
-                  placeholder: "Email for receiving invoices",
-                },
-              ],
-            },
-            {
-              label: "Taiwan UBN (8-digit Uniform Business Number)",
-              className: "basis-full [&_[data-labels]]:flex-wrap",
-              fields: [
-                {
-                  name: "tax_id",
-                  type: "text",
-                  placeholder: "8-digit Taiwan UBN",
-                },
-              ],
-            },
-            {
-              label: "Company Title",
-              className: "basis-full [&_[data-labels]]:flex-wrap",
-              fields: [
-                {
-                  name: "tax_title",
-                  type: "text",
-                  placeholder: "Company’s full legal name (for invoicing)",
-                },
-              ],
-            },
-            {
-              children: (
-                <Ul className="text-xs">
-                  <li>
-                    Once your event registration is confirmed, invoice details cannot be modified. Please review your invoice information carefully before completing registration.
-                  </li>
-                </Ul>
-              ),
-            },
-          ]}
+        {/* Form */}
+        <Form
+          key={`checkout-${defaultValues.tax_email}-${defaultValues.tax_title}-${defaultValues.tax_id}`} // Force re-render when data changes
+          className="flex flex-col gap-5 basis-full sm:basis-1/2 text-black/80"
+          onSubmit={handleFormSubmit}
+          schema={CheckoutSchema}
+          defaultValues={defaultValues}
+        fieldsGroups={[
+          {
+            children: (
+              <div className="text-xl text-black font-medium">Invoice</div>
+            ),
+          },
+          {
+            label: "＊ Invoice Email Address",
+            className: "basis-full [&_[data-labels]]:flex-wrap",
+            fields: [
+              {
+                name: "tax_email",
+                type: "text",
+                placeholder: "Email for receiving invoices",
+              },
+            ],
+          },
+          {
+            label: "Taiwan UBN (8-digit Uniform Business Number)",
+            className: "basis-full [&_[data-labels]]:flex-wrap",
+            fields: [
+              {
+                name: "tax_id",
+                type: "text",
+                placeholder: "8-digit Taiwan UBN",
+              },
+            ],
+          },
+          {
+            label: "Company Title",
+            className: "basis-full [&_[data-labels]]:flex-wrap",
+            fields: [
+              {
+                name: "tax_title",
+                type: "text",
+                placeholder: "Company’s full legal name (for invoicing)",
+              },
+            ],
+          },
+          {
+            children: (
+              <Ul className="text-xs">
+                <li>
+                  Once your event registration is confirmed, invoice details cannot be modified. Please review your invoice information carefully before completing registration.
+                </li>
+              </Ul>
+            ),
+          },
+        ]}
         >
           <button ref={submitRef} className="hidden" type="submit" />
         </Form>
-        )}
         <div className="basis-full sm:basis-1/2 flex flex-col gap-5">
           {buyer && <OrderSummary buyer={buyer} />}
           <PaymentConfirm

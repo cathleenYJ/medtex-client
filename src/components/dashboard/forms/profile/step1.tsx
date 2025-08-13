@@ -15,6 +15,7 @@ import type { FormParams } from "@/types";
 import { fetchData } from "@/data/fetch-data";
 import { ProfileFormSchema } from "./state";
 import { useProfileUpdate } from "./use-profile-update";
+import { LoadingBlock } from "@dashboard/loading-block";
 
 export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
   const {
@@ -34,14 +35,14 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     companyAddress: "",
   });
   const [isFormReady, setIsFormReady] = useState(false);
-  
   // Fetch profile data to prefill form
   const { data: profileData, isLoading } = useQuery({
     queryKey: ["profile-data"],
     queryFn: () => fetchData.sellers.getProfileData(session),
     enabled: !!session?.user.adminToken,
   });
-
+  // Use the updated useProfileUpdate hook (must be called before any return)
+  const { isPending, updateProfile } = useProfileUpdate(selectedType, Number(step));
   // Update default values when profile data is loaded - 優先使用 profile_info
   useEffect(() => {
     if (profileData?.data?.profile_info) {
@@ -55,9 +56,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
         business_id,
         company_address 
       } = profileData.data.profile_info;
-      
       const newValues = {
-        // 優先使用 profile_info 中的資料
         contact_email: contact_email || user.email || "",
         first_name: first_name || "",
         last_name: last_name || "",
@@ -68,11 +67,9 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
         companyAddress: company_address || "",
       };
       setDefaultValues(newValues);
-      
       // Auto-detect account type based on existing data - 只有在資料完整時才自動設定
       const hasCompletePersonalData = first_name && last_name;
       const hasCompleteCorporateData = company_name && business_id && company_address;
-      
       if (hasCompleteCorporateData) {
         setSelectedType("corporate");
       } else if (hasCompletePersonalData) {
@@ -80,16 +77,20 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
       } else {
         // Incomplete data, user needs to select account type manually
       }
-      
       setIsFormReady(true);
     } else if (!isLoading) {
       // If no profile data and not loading, mark form as ready with current default values
       setIsFormReady(true);
     }
   }, [profileData, isLoading, user.email]);
-  
-  // Use the updated useProfileUpdate hook
-  const { isPending, updateProfile } = useProfileUpdate(selectedType, Number(step));
+  // loading 狀態判斷（放在所有 hook 之後）
+  if (isLoading || !isFormReady) {
+    return (
+      <div className="flex flex-col gap-8 w-3xl max-w-full text-black/80">
+        <LoadingBlock />
+      </div>
+    );
+  }
 
   // Handle account type change and reset form
   const handleTypeChange = (type: "personal" | "corporate") => {
@@ -201,138 +202,136 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
       </div>
 
       {/* Form */}
-      {isFormReady && (
-        <Form
-          key={`${selectedType}-${defaultValues.contact_email}-${defaultValues.first_name}`} // Force re-render when account type or data changes
-          className="flex flex-col gap-5 w-full text-black/80"
-          onSubmit={updateProfile}
-          schema={getDynamicSchema()}
-          defaultValues={defaultValues}
-          fieldsGroups={[
+      <Form
+        key={`${selectedType}-${defaultValues.contact_email}-${defaultValues.first_name}`} // Force re-render when account type or data changes
+        className="flex flex-col gap-5 w-full text-black/80"
+        onSubmit={updateProfile}
+        schema={getDynamicSchema()}
+        defaultValues={defaultValues}
+        fieldsGroups={[
+      {
+        children: (
+          <div className="text-xl text-black font-medium">Contact Info</div>
+        ),
+      },
+      ...(isPersonal ? [
+        {
+          label: "* Full Name ( Contact Person )",
+          className: "basis-full [&_[data-labels]]:flex [&_[data-labels]]:flex-col [&_[data-labels]]:gap-5 xs:[&_[data-labels]]:flex-row",
+          fields: [
+            {
+              name: "first_name",
+              type: "text",
+              placeholder: "First Name",
+              className: "w-full xs:flex-1",
+            },
+            {
+              name: "last_name",
+              type: "text",
+              placeholder: "Last Name",
+              className: "w-full xs:flex-1",
+            },
+          ],
+        },
+      ] : []),
+      {
+        label: "* Email Address",
+        className: "basis-full",
+        fields: [
+          {
+            name: "contact_email",
+            type: "email",
+            placeholder: "you@example.com",
+            className: "basis-full",
+          },
+        ],
+      },
+      {
+        label: "Address (Optional)",
+        className: "basis-full",
+        fields: [
+          {
+            name: "address",
+            type: "text",
+            placeholder: "Your address",
+            className: "basis-full",
+          },
+        ],
+      },
+      ...(isPersonal ? [] : [
         {
           children: (
-            <div className="text-xl text-black font-medium">Contact Info</div>
+            <Hr className="w-full my-5 h-px border-none bg-[rgba(19,19,20,0.20)]" />
           ),
         },
-        ...(isPersonal ? [
-          {
-            label: "* Full Name ( Contact Person )",
-            className: "basis-full [&_[data-labels]]:flex [&_[data-labels]]:flex-col [&_[data-labels]]:gap-5 xs:[&_[data-labels]]:flex-row",
-            fields: [
-              {
-                name: "first_name",
-                type: "text",
-                placeholder: "First Name",
-                className: "w-full xs:flex-1",
-              },
-              {
-                name: "last_name",
-                type: "text",
-                placeholder: "Last Name",
-                className: "w-full xs:flex-1",
-              },
-            ],
-          },
-        ] : []),
         {
-          label: "* Email Address",
-          className: "basis-full",
-          fields: [
-            {
-              name: "contact_email",
-              type: "email",
-              placeholder: "You@example.com",
-              className: "basis-full",
-            },
-          ],
+          children: (
+            <div className="text-xl text-black font-medium w-full">
+              Organization / Company Info
+            </div>
+          ),
         },
         {
-          label: "Address (Optional)",
+          label: "* Organization / Company Name",
           className: "basis-full",
           fields: [
             {
-              name: "address",
+              name: "companyName",
               type: "text",
-              placeholder: "Your address",
+              placeholder: "Your company name",
               className: "basis-full",
             },
           ],
         },
-        ...(isPersonal ? [] : [
-          {
-            children: (
-              <Hr className="w-full my-5 h-px border-none bg-[rgba(19,19,20,0.20)]" />
-            ),
-          },
-          {
-            children: (
-              <div className="text-xl text-black font-medium w-full">
-                Organization / Company Info
-              </div>
-            ),
-          },
-          {
-            label: "* Organization / Company Name",
-            className: "basis-full",
-            fields: [
-              {
-                name: "companyName",
-                type: "text",
-                placeholder: "Your company name",
-                className: "basis-full",
-              },
-            ],
-          },
-          {
-            label: "Organization / Company Name - Chinese (Optional)",
-            className: "basis-full",
-            fields: [
-              {
-                name: "companyNameChinese",
-                type: "text",
-                placeholder: "Your company name in Chinese",
-                className: "basis-full",
-              },
-            ],
-          },
-          {
-            label: "* Taiwan UBN (8-digit Uniform Business Number)",
-            className: "basis-full",
-            fields: [
-              {
-                name: "businessId",
-                type: "text",
-                placeholder: "8-digit Taiwan UBN",
-                className: "basis-full",
-              },
-            ],
-          },
-          {
-            label: "* Organization / Company Address",
-            className: "basis-full",
-            fields: [
-              {
-                name: "companyAddress",
-                type: "text",
-                placeholder: "Your company address",
-                className: "basis-full",
-              },
-            ],
-          },
-        ] as Array<Record<string, unknown>>),
-      ] as Array<Record<string, unknown>>}
-    >
-      <Confirm cancelClick={() => router.back()}>
-        <Button
-          variant="auth"
-          type="submit"
-          loading={isPending || isLoading}
-        >
-          Continue
-        </Button>
-      </Confirm>
-    </Form>
-      )}
+        {
+          label: "Organization / Company Name - Chinese (Optional)",
+          className: "basis-full",
+          fields: [
+            {
+              name: "companyNameChinese",
+              type: "text",
+              placeholder: "Your company name in Chinese",
+              className: "basis-full",
+            },
+          ],
+        },
+        {
+          label: "* Taiwan UBN (8-digit Uniform Business Number)",
+          className: "basis-full",
+          fields: [
+            {
+              name: "businessId",
+              type: "text",
+              placeholder: "8-digit Taiwan UBN",
+              className: "basis-full",
+            },
+          ],
+        },
+        {
+          label: "* Organization / Company Address",
+          className: "basis-full",
+          fields: [
+            {
+              name: "companyAddress",
+              type: "text",
+              placeholder: "Your company address",
+              className: "basis-full",
+            },
+          ],
+        },
+      ] as Array<Record<string, unknown>>),
+    ] as Array<Record<string, unknown>>}
+      >
+        <Confirm cancelClick={() => router.back()}>
+          <Button
+            variant="auth"
+            type="submit"
+            loading={isPending || isLoading}
+          >
+            Continue
+          </Button>
+        </Confirm>
+      </Form>
     </div>
   );
-};
+}

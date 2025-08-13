@@ -1,10 +1,10 @@
 import React from "react";
-import { QRCodeIcon } from "@/components/icons";
+import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 
 interface QRCodeModalProps {
   isOpen: boolean;
-  ticketNo: React.ReactNode;
+  ticketNo: string;
   onClose: () => void;
 }
 
@@ -18,8 +18,11 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, ticketNo, onCl
         onClick={(e) => e.stopPropagation()}
       >
         {/* QR Code */}
-        <div className="w-[283.235px] h-[283.235px] flex-shrink-0 aspect-square bg-gray-100 rounded border flex items-center justify-center self-center">
+        {/* <div className="w-[283.235px] h-[283.235px] flex-shrink-0 aspect-square bg-gray-100 rounded border flex items-center justify-center self-center">
           <QRCodeIcon className="w-full h-full" />
+        </div> */}
+        <div className="w-[230px] h-[230px] flex-shrink-0 aspect-square bg-gray-100 rounded flex items-center justify-center self-center">
+          <QRCode value={ticketNo} size={230} />
         </div>
         
         {/* Ticket No */}

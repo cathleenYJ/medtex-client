@@ -89,7 +89,7 @@ export const Signup: React.FC = () => {
             {
               name: "email",
               type: "text",
-              placeholder: "You@example.com",
+              placeholder: "you@example.com",
             },
           ],
         },

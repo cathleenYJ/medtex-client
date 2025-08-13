@@ -53,14 +53,12 @@ export const RegistrationCard: React.FC<RegistrationCardProps> = ({ data }) => {
   const handleRegister = () => {
     // 導向註冊表單的第一步
     const targetPath = `${Routes.private.registrationForm}/1`;
-    console.log("Navigating to:", targetPath);
     router.push(targetPath);
   };
 
   const handleContinue = () => {
     // Continue 按鈕也導向註冊表單的第一步
     const targetPath = `${Routes.private.registrationForm}/1`;
-    console.log("Continuing to:", targetPath);
     router.push(targetPath);
   };
 

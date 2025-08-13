@@ -21,7 +21,6 @@ export const useInvoiceUpdate = () => {
     mutationKey: ["update-invoice-info"],
     mutationFn: (data: InvoiceData) => fetchData.sellers.invoiceInfoUpdate(data, session),
     onSuccess: (response) => {
-      console.log("Invoice info updated successfully:", response);
       // You can add success handling here (e.g., show success message)
     },
     onError: (error) => {
@@ -44,7 +43,6 @@ export const useInvoiceUpdate = () => {
     // tax_title -> invoice_company_name
     if (data.tax_title) apiData.invoice_company_name = data.tax_title;
 
-    console.log("Sending invoice API data:", apiData);
     updateInvoiceInfo(apiData);
   };
 

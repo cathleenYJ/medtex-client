@@ -342,7 +342,7 @@ class FetchData {
         session,
         "admin"
       ),
-    orderMeetingDetails: (meetingId: number, session: Session | null = null) =>
+    orderMeetingDetails: (meetingId?: number, session: Session | null = null) =>
       this.method
         .get<OrderMeetingDetailsResponse>(
           `${API_ENDPOINTS.AUTH_ORDER_MEETING_DETAILS}/${meetingId}/details`,

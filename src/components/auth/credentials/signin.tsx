@@ -44,7 +44,7 @@ export const CredentialsSignin: React.FC<{
             {
               name: "username",
               type: "text",
-              placeholder: "You@example.com",
+              placeholder: "you@example.com",
             },
           ],
         },

@@ -59,7 +59,7 @@ export const ForgetPassword = () => {
         {
           label: "Email",
           fields: [
-            { name: "email", type: "text", placeholder: "You@example.com" },
+            { name: "email", type: "text", placeholder: "you@example.com" },
           ],
         },
       ]}

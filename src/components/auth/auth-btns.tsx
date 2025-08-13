@@ -22,7 +22,7 @@ export const AuthBtn: React.FC = () => {
   ) : (
     <Button
       key={authItem.key}
-      className="px-6 py-3 bg-b2b-lv4 text-b2b-lv1 rounded-sm text-sm"
+      // className="px-6 py-3 bg-b2b-lv4 text-b2b-lv1 rounded-sm text-sm"
       onClick={authItem.onClick}
     >
       {authItem.label}

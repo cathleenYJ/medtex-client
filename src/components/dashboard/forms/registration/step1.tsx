@@ -12,6 +12,7 @@ import { InfoCircle } from "@/components/icons/basic";
 import { fetchData } from "@/data/fetch-data";
 import { RegistrationFormSchema } from "./state";
 import { useParticipantUpdate } from "./use-participant-update";
+import { LoadingBlock } from "@dashboard/loading-block";
 import type { ParticipantData } from "@/types/participant";
 
 interface Step1Props {
@@ -50,10 +51,6 @@ export const Step1: React.FC<Step1Props> = ({
     if (profileData?.data) {
       const { participant_info, profile_info } = profileData.data;
       
-      console.log("Profile data loaded:", profileData.data);
-      console.log("participant_info:", participant_info);
-      console.log("profile_info:", profile_info);
-      
       const newValues = {
         contactPhoneCode: { id: "TW", name: "886" },
         dietaryPreferences: { id: "regular", name: "Regular" },
@@ -67,8 +64,6 @@ export const Step1: React.FC<Step1Props> = ({
         companyNameChinese: participant_info?.participant_company_name_zh || profile_info?.company_name_zh || "", // 新增欄位，暫時設為空字串
       };
       
-      console.log("Setting default values:", newValues);
-      
       setDefaultValues(newValues);
       setIsFormReady(true);
     } else if (!isLoading) {
@@ -77,8 +72,18 @@ export const Step1: React.FC<Step1Props> = ({
     }
   }, [profileData, isLoading]);
 
-  // Use the new useParticipantUpdate hook
+
+  // Use the new useParticipantUpdate hook (must be called before any return)
   const { isPending, updateParticipant } = useParticipantUpdate();
+
+  // Show loading block while waiting for all data to be ready
+  if (isLoading || !isFormReady) {
+    return (
+      <div className="flex flex-col gap-8 w-3xl max-w-full text-black/80">
+        <LoadingBlock />
+      </div>
+    );
+  }
 
   // 根據模式設定標題和按鈕文字
   const isEditMode = mode === 'edit';
@@ -87,14 +92,8 @@ export const Step1: React.FC<Step1Props> = ({
 
   // 根據模式調整提交後的行為
   const handleSubmit = async (data: z.infer<typeof RegistrationFormSchema>) => {
-    console.log("Form data received:", data);
-    console.log("Company Name:", `'${data.companyName}'`);
-    console.log("Company Name Chinese:", `'${data.companyNameChinese}'`);
-    console.log("Current mode:", mode);
-    console.log("isEditMode:", isEditMode);
     
     if (isEditMode) {
-      console.log("Entering edit mode logic");
       // 編輯模式：只更新數據，不執行導航邏輯
       try {
         // 直接調用 API 更新參與者資訊，但不執行 onSuccess 的導航
@@ -111,22 +110,13 @@ export const Step1: React.FC<Step1Props> = ({
         // 只有當公司名稱有值時才加入 API 資料
         if (data.companyName && data.companyName.trim() !== '') {
           apiData.participant_company_name = data.companyName;
-          console.log("Adding company name to API data:", data.companyName);
-        } else {
-          console.log("Company name is empty or null, not adding to API data");
         }
         
         if (data.companyNameChinese && data.companyNameChinese.trim() !== '') {
           apiData.participant_company_name_zh = data.companyNameChinese;
-          console.log("Adding Chinese company name to API data:", data.companyNameChinese);
-        } else {
-          console.log("Chinese company name is empty or null, not adding to API data");
         }
         
-        console.log("API data being sent:", apiData);
-        
         await fetchData.sellers.participantInfoUpdate(apiData, session);
-        console.log("Participant info updated successfully in edit mode");
         
         if (onSaveComplete) {
           onSaveComplete(); // 回到 Registration Record 頁面
@@ -135,7 +125,6 @@ export const Step1: React.FC<Step1Props> = ({
         console.error("Failed to update participant info:", error);
       }
     } else {
-      console.log("Entering create mode logic");
       // 創建模式：執行原本的邏輯（包含導航到 checkout）
       await updateParticipant(data);
     }
@@ -145,136 +134,134 @@ export const Step1: React.FC<Step1Props> = ({
     <div className="flex flex-col gap-8 w-3xl max-w-full text-black/80">
         <StepInfo title={title} />
 
-      {/* Only render form when ready */}
-      {isFormReady && (
-        <Form
-          key={`registration-${defaultValues.firstName}-${defaultValues.lastName}-${defaultValues.emailAddress}-${defaultValues.jobTitle}-${defaultValues.companyName}`} // Force re-render when data changes
-          className="flex flex-col gap-5 w-full text-black/80"
-          onSubmit={handleSubmit}
-          schema={RegistrationFormSchema}
-          defaultValues={defaultValues}
-        fieldsGroups={[
-          {
-            children: (
-              <div className="text-xl text-black font-medium">Participant Details</div>
-            ),
-          },
-          {
-            label: "* Full Name",
-            className: "basis-full [&_[data-labels]]:flex [&_[data-labels]]:flex-col [&_[data-labels]]:gap-5 xs:[&_[data-labels]]:flex-row",
-            fields: [
-              {
-                name: "firstName",
-                type: "text",
-                placeholder: "First Name",
-                className: "w-full xs:flex-1",
-              },
-              {
-                name: "lastName",
-                type: "text",
-                placeholder: "Last Name",
-                className: "w-full xs:flex-1",
-              },
-            ],
-          },
-          {
-            label: "* Organization / Company Name",
-            className: "basis-full",
-            fields: [
-              {
-                name: "companyName",
-                type: "text",
-                placeholder: "Your organization or company name",
-                className: "basis-full",
-              },
-            ],
-          },
-          {
-            label: "Organization / Company Name - Chinese (Optional)",
-            className: "basis-full",
-            fields: [
-              {
-                name: "companyNameChinese",
-                type: "text",
-                placeholder: "公司或機構名稱（中文）",
-                className: "basis-full",
-              },
-            ],
-          },
-          {
-            label: "* Job Title / Position",
-            className: "basis-full",
-            fields: [
-              {
-                name: "jobTitle",
-                type: "text",
-                placeholder: "Your job title or position",
-                className: "basis-full",
-              },
-            ],
-          },
-          {
-            label: "",
-            className: "basis-full [&_[data-labels]]:flex [&_[data-labels]]:flex-col [&_[data-labels]]:gap-5 xs:[&_[data-labels]]:flex-row",
-            fields: [
-              {
-                name: "mobileNumber",
-                type: "text",
-                placeholder: "+886 000-000-000",
-                className: "w-full xs:flex-1",
-                label: "* Mobile Number",
-              },
-              {
-                name: "emailAddress",
-                type: "email",
-                placeholder: "you@example.com",
-                className: "w-full xs:flex-1",
-                label: "* Email Address",
-              },
-            ],
-          },
-          {
-            label: "* Dietary Preferences",
-            className: "basis-full",
-            fields: [
-              {
-                name: "dietaryPreferences",
-                type: "select",
-                placeholder: "Select dietary preference",
-                className: "w-full",
-                items: [
-                  { id: "regular", name: "Regular" },
-                  { id: "vegetarian", name: "Vegetarian" },
-                ],
-              },
-            ],
-          },
-        ] as Array<Record<string, unknown>>}
-      >
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
-          <div className="flex items-center justify-center sm:justify-start gap-2">
-            <InfoCircle className="w-4 h-4" />
-            <span 
-              style={{
-                fontSize: '14px',
-                fontWeight: 400,
-              }}
-            >
-              Locked 3 days before event
-            </span>
-          </div>
-          <Confirm cancelClick={() => router.back()}>
-            <Button
-              variant="auth"
-              type="submit"
-              loading={isPending || isLoading}
-            >
-              {buttonText}
-            </Button>
-          </Confirm>
+      {/* Form */}
+      <Form
+        key={`registration-${defaultValues.firstName}-${defaultValues.lastName}-${defaultValues.emailAddress}-${defaultValues.jobTitle}-${defaultValues.companyName}`} // Force re-render when data changes
+        className="flex flex-col gap-5 w-full text-black/80"
+        onSubmit={handleSubmit}
+        schema={RegistrationFormSchema}
+        defaultValues={defaultValues}
+      fieldsGroups={[
+        {
+          children: (
+            <div className="text-xl text-black font-medium">Participant Details</div>
+          ),
+        },
+        {
+          label: "* Full Name",
+          className: "basis-full [&_[data-labels]]:flex [&_[data-labels]]:flex-col [&_[data-labels]]:gap-5 xs:[&_[data-labels]]:flex-row",
+          fields: [
+            {
+              name: "firstName",
+              type: "text",
+              placeholder: "First Name",
+              className: "w-full xs:flex-1",
+            },
+            {
+              name: "lastName",
+              type: "text",
+              placeholder: "Last Name",
+              className: "w-full xs:flex-1",
+            },
+          ],
+        },
+        {
+          label: "* Organization / Company Name",
+          className: "basis-full",
+          fields: [
+            {
+              name: "companyName",
+              type: "text",
+              placeholder: "Your organization or company name",
+              className: "basis-full",
+            },
+          ],
+        },
+        {
+          label: "Organization / Company Name - Chinese (Optional)",
+          className: "basis-full",
+          fields: [
+            {
+              name: "companyNameChinese",
+              type: "text",
+              placeholder: "公司或機構名稱（中文）",
+              className: "basis-full",
+            },
+          ],
+        },
+        {
+          label: "* Job Title / Position",
+          className: "basis-full",
+          fields: [
+            {
+              name: "jobTitle",
+              type: "text",
+              placeholder: "Your job title or position",
+              className: "basis-full",
+            },
+          ],
+        },
+        {
+          label: "",
+          className: "basis-full [&_[data-labels]]:flex [&_[data-labels]]:flex-col [&_[data-labels]]:gap-5 xs:[&_[data-labels]]:flex-row",
+          fields: [
+            {
+              name: "mobileNumber",
+              type: "text",
+              placeholder: "+886 000-000-000",
+              className: "w-full xs:flex-1",
+              label: "* Mobile Number",
+            },
+            {
+              name: "emailAddress",
+              type: "email",
+              placeholder: "you@example.com",
+              className: "w-full xs:flex-1",
+              label: "* Email Address",
+            },
+          ],
+        },
+        {
+          label: "* Dietary Preferences",
+          className: "basis-full",
+          fields: [
+            {
+              name: "dietaryPreferences",
+              type: "select",
+              placeholder: "Select dietary preference",
+              className: "w-full",
+              items: [
+                { id: "regular", name: "Regular" },
+                { id: "vegetarian", name: "Vegetarian" },
+              ],
+            },
+          ],
+        },
+      ] as Array<Record<string, unknown>>}
+    >
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
+        <div className="flex items-center justify-center sm:justify-start gap-2">
+          <InfoCircle className="w-4 h-4" />
+          <span 
+            style={{
+              fontSize: '14px',
+              fontWeight: 400,
+            }}
+          >
+            Locked 3 days before event
+          </span>
         </div>
-      </Form>
-      )}
+        <Confirm cancelClick={() => router.back()}>
+          <Button
+            variant="auth"
+            type="submit"
+            loading={isPending || isLoading}
+          >
+            {buttonText}
+          </Button>
+        </Confirm>
+      </div>
+    </Form>
     </div>
   );
 };
