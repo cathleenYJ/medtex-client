@@ -6,7 +6,7 @@ import { WarningBlock } from "@ui/warning-block";
 import { ConfigValue } from "@/config";
 import type { BuyerData } from "@/types";
 
-export const MeetingInfo: React.FC<{ buyer: BuyerData }> = ({ buyer }) => {
+export const MeetingInfo: React.FC<{ buyer: BuyerData }> = () => {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2.5">
@@ -20,7 +20,7 @@ export const MeetingInfo: React.FC<{ buyer: BuyerData }> = ({ buyer }) => {
         confirmed by the buyer) with this buyer. To proceed, your credit card
         will be pre-authorized for USD $100.
       </div>
-      <SmallProfile buyer={buyer} />
+      <SmallProfile />
       <WarningBlock className="bg-b2b-lv6/60 text-b2b-lv2">
         You will only be charged if the buyer accepts the request.
       </WarningBlock>
