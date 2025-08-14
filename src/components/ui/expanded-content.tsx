@@ -1,7 +1,7 @@
 import React from "react";
 import { DetailSection } from "./detail-section";
 import { DetailRow } from "./detail-row";
-import { EditIcon } from "@/components/icons";
+// import { EditIcon } from "@/components/icons";s
 import { RegistrationCardData } from "./registration-card";
 
 interface ExpandedContentProps {
@@ -42,7 +42,8 @@ export const ExpandedContent: React.FC<ExpandedContentProps> = ({ data, onEdit }
           </DetailSection>
         </div>
 
-        {/* 編輯按鈕 - 大螢幕時在右側 */}
+        {/* 編輯按鈕 - 大螢幕時在右側 (暫時註解) */}
+        {/**
         <button 
           onClick={onEdit}
           className="sm:flex hidden items-center gap-2 text-[#0098C6] font-medium text-base leading-[30px] hover:text-[#007ba3] transition-colors flex-shrink-0"
@@ -50,6 +51,7 @@ export const ExpandedContent: React.FC<ExpandedContentProps> = ({ data, onEdit }
           <EditIcon />
           Edit
         </button>
+        */}
       </div>
     </>
   );

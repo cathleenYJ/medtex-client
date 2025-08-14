@@ -1,5 +1,5 @@
 import React from "react";
-import { EditIcon } from "@/components/icons";
+// import { EditIcon } from "@/components/icons";
 
 interface DetailSectionProps {
   title: string;
@@ -11,8 +11,8 @@ interface DetailSectionProps {
 export const DetailSection: React.FC<DetailSectionProps> = ({ 
   title, 
   children, 
-  showEditButton = false,
-  onEdit 
+  // showEditButton = false,
+  // onEdit 
 }) => {
   return (
     <div className="flex-1 relative min-w-0 overflow-hidden">
@@ -20,6 +20,8 @@ export const DetailSection: React.FC<DetailSectionProps> = ({
         <h3 className="text-medtex-blue font-bold leading-[30px] sm:text-lg text-base">
           {title}
         </h3>
+        {/* Edit 按鈕暫時註解 */}
+        {/**
         {showEditButton && (
           <button 
             onClick={onEdit}
@@ -29,6 +31,7 @@ export const DetailSection: React.FC<DetailSectionProps> = ({
             Edit
           </button>
         )}
+        */}
       </div>
       <div className="space-y-2">
         {children}
