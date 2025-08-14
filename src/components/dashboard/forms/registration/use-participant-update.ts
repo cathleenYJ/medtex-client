@@ -3,7 +3,6 @@
 import * as z from "zod/v4";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { SubmitHandler } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { fetchData } from "@/data/fetch-data";
 import { Routes } from "@/config/routes";
