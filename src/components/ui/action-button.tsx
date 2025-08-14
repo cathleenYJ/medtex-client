@@ -6,15 +6,17 @@ interface ActionButtonProps {
   isPaymentComplete?: boolean;
   isRegistered?: boolean;
   ticketNumber?: string;
+  meetingId?: number;
   onQRClick?: () => void;
-  onContinueClick?: () => void;
-  onRegisterClick?: () => void;
+  onContinueClick?: (meetingId?: number) => void;
+  onRegisterClick?: (meetingId?: number) => void;
 }
 
 export const ActionButton: React.FC<ActionButtonProps> = ({
   isPaymentComplete,
   isRegistered,
   ticketNumber,
+  meetingId,
   onQRClick,
   onContinueClick,
   onRegisterClick
@@ -49,7 +51,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       <Button
         variant="auth"
         className="sm:!w-[130px] sm:!h-auto !h-10 sm:flex-none flex-1"
-        onClick={onContinueClick}
+        onClick={() => onContinueClick?.(meetingId)}
       >
         Continue
       </Button>
@@ -61,7 +63,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
     <Button
       variant="auth"
       className="sm:!w-[130px] sm:!h-auto !h-10 sm:flex-none flex-1"
-      onClick={onRegisterClick}
+      onClick={() => onRegisterClick?.(meetingId)}
     >
       Register
     </Button>

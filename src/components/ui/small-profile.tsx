@@ -1,11 +1,10 @@
 import clsx from "clsx";
 import Image from "next/image";
 import { apiImageUrl } from "@/utils/api-image-url";
-import type { BuyerData } from "@/types";
 
-export const SmallProfile: React.FC<{ buyer: BuyerData }> = ({ buyer }) => (
+export const SmallProfile: React.FC = () => (
   <div
-    data-component-theme={buyer.profile_theme || "green"}
+    data-component-theme="green"
     className={clsx(
       "flex flex-row gap-5",
       "rounded-lg p-4",
@@ -17,8 +16,8 @@ export const SmallProfile: React.FC<{ buyer: BuyerData }> = ({ buyer }) => (
         className="bg-white rounded-md aspect-square object-contain"
         width={48}
         height={48}
-        src={apiImageUrl(buyer.company_logo_small)}
-        alt="buyer logo"
+        src={apiImageUrl("/public/example_logo_small.png")}
+        alt=" "
       />
     </div>
     <div>

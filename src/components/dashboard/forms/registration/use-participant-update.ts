@@ -25,16 +25,13 @@ export const useParticipantUpdate = () => {
   const { mutate: updateParticipantInfo, isPending } = useMutation({
     mutationKey: ["update-participant-info"],
     mutationFn: (data: ParticipantData) => fetchData.sellers.participantInfoUpdate(data, session),
-    onSuccess: () => {
-      // Navigate to checkout form after successful update
-      router.push(`${Routes.private.checkoutForm}/1`);
-    },
     onError: (error) => {
       console.error("Failed to update participant info:", error);
     },
   });
 
-  const updateParticipant: SubmitHandler<z.infer<typeof RegistrationFormSchema>> = (data) => {
+  // 新增 meetingId 參數
+  const updateParticipant = (data: z.infer<typeof RegistrationFormSchema>, meetingId?: string) => {
     // Get account type from localStorage
     const accountType = typeof window !== "undefined" 
       ? localStorage.getItem("accountType") as "personal" | "corporate" | null
@@ -75,8 +72,16 @@ export const useParticipantUpdate = () => {
       appId: 863 // Temporary ID, should come from API response
     });
 
-    // Update participant info via API
-    updateParticipantInfo(apiData);
+    // Update participant info via API, then navigate to checkout with meetingId if present
+    updateParticipantInfo(apiData, {
+      onSuccess: () => {
+        if (meetingId) {
+          router.push(`${Routes.private.checkoutForm}/1?meetingId=${meetingId}`);
+        } else {
+          router.push(`${Routes.private.checkoutForm}/1`);
+        }
+      }
+    });
   };
 
   return { isPending, updateParticipant };

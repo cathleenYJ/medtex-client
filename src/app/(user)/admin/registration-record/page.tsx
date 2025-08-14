@@ -43,7 +43,7 @@ export default function RegistrationRecordPage() {
     dataArray.forEach((meetingBlock) => {
       const { orders, meeting_details, payment_history, participant_details } = meetingBlock as {
         orders: Array<{ id: number; status: string; amount: number; merchant_trade_no?: string }>;
-        meeting_details: { start_time: string; end_time: string; title: string; address: string };
+        meeting_details: { id: number; start_time: string; end_time: string; title: string; address: string };
         payment_history: Array<{ order_id: number; invoice_date?: number; invoice_number?: string }>;
         participant_details: {
           participant_full_name: string;
@@ -105,6 +105,7 @@ export default function RegistrationRecordPage() {
           ticket_number: order.merchant_trade_no || `-`,
           meeting_title: meeting_details.title,
           meeting_address: meeting_details.address,
+          meeting_id: meeting_details.id,
         };
         allItems.push(registrationItem);
       });

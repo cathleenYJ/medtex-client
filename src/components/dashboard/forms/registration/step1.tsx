@@ -126,7 +126,9 @@ export const Step1: React.FC<Step1Props> = ({
       }
     } else {
       // 創建模式：執行原本的邏輯（包含導航到 checkout）
-      await updateParticipant(data);
+      const searchParams = new URLSearchParams(window.location.search);
+      const meetingId = searchParams.get('meetingId') || undefined;
+      await updateParticipant(data, meetingId);
     }
   };
 

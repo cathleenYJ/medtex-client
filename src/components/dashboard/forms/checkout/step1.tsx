@@ -30,9 +30,22 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     currentRequest: { buyer, appId },
   } = useCurrentRequest();
   
-  // Get meeting_id from URL parameters
+  // 先取得 getMeetingIdAsNumber，若無則從 URL search param 取得
   const { getMeetingIdAsNumber } = useMeetingId();
-  const meetingId = getMeetingIdAsNumber();
+  let meetingId: number | undefined = undefined;
+  const idFromHook = getMeetingIdAsNumber();
+  let paramId: string | null = null;
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    paramId = searchParams.get('meetingId');
+  }
+  console.log('getMeetingIdAsNumber:', idFromHook);
+  console.log('URL search param meetingId:', paramId);
+  if (typeof idFromHook === 'number' && !isNaN(idFromHook)) {
+    meetingId = idFromHook;
+  } else if (paramId && !isNaN(Number(paramId))) {
+    meetingId = Number(paramId);
+  }
   
   const router = useRouter();
   const submitRef = useRef<HTMLButtonElement>(null);
@@ -108,12 +121,15 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
   });
   // Keep the payment mutation for making payment after checkout
   const { isPending: isPaymentPending, mutate: makePaymentMutation } = useMutation({
+    // Use the new API endpoint for payme
     mutationKey: ["checkout"],
-    mutationFn: (data: PaymentData) =>
-      fetch("/api/transform/payment", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+    mutationFn: (data: PaymentData) =>{
+  console.log("Payment request data:", data);
+  return fetch("/api/transform/payment", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+},
     onSuccess: async (res) => {
       const formHtml = await res.text();
       const hasError = formHtml.includes('"success":false');
@@ -158,8 +174,8 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     // Step 1: Update invoice information
     updateInvoice(processedData);
     
-    // Step 2: If we have meetingId, call AUTH_CHECKOUT API, otherwise use appId for direct payment
-    if (meetingId) {
+    // Step 2: Use resolved meetingId for checkout
+    if (typeof meetingId === 'number' && !isNaN(meetingId)) {
       callCheckoutAPI(meetingId, {
         onSuccess: (response) => {
           const checkoutData = response.data;
@@ -178,7 +194,6 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
             );
             return;
           }
-          
           // Step 3: Make payment with order_number from checkout response
           makePaymentMutation({ 
             gateway_id: 25, 
@@ -192,26 +207,17 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
           console.error("Checkout API failed:", error);
         }
       });
-    } else if (appId) {
-      // Fallback to original flow if no meetingId but have appId
-      makePaymentMutation({ 
-        gateway_id: 25, 
-        order_id: appId,
-        tax_id: processedData.tax_id,
-        tax_title: processedData.tax_title,
-        tax_email: processedData.tax_email
-      });
     } else {
-      console.error("No meetingId or appId available for payment");
+      // meetingId 不存在，顯示錯誤
       openModal(
         <Message
-          title="Payment Error"
+          title="Meeting ID Not Found"
           closeModal={async () => {
             await closeModal();
             router.back();
           }}
         >
-          No valid order ID found. Please try again.
+          No meetingId found. Please return and select a meeting.
         </Message>
       );
     }
@@ -335,7 +341,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
           <button ref={submitRef} className="hidden" type="submit" />
         </Form>
         <div className="basis-full sm:basis-1/2 flex flex-col gap-5">
-          {buyer && <OrderSummary buyer={buyer} />}
+          <OrderSummary/>
           <PaymentConfirm
             confirm={confirm}
             setConfirm={setConfirm}

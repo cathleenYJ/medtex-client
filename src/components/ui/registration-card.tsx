@@ -33,6 +33,7 @@ export interface RegistrationCardData {
   // 會議詳細資訊
   meeting_title?: string;
   meeting_address?: string;
+  meeting_id?: number;
 }
 
 interface RegistrationCardProps {
@@ -50,15 +51,19 @@ export const RegistrationCard: React.FC<RegistrationCardProps> = ({ data }) => {
     router.push(targetPath);
   };
 
-  const handleRegister = () => {
-    // 導向註冊表單的第一步
-    const targetPath = `${Routes.private.registrationForm}/1`;
+  const handleRegister = (meetingId?: number) => {
+    // 導向註冊表單的第一步，帶入 meetingId
+    const targetPath = meetingId
+      ? `${Routes.private.registrationForm}/1?meetingId=${meetingId}`
+      : `${Routes.private.registrationForm}/1`;
     router.push(targetPath);
   };
 
-  const handleContinue = () => {
-    // Continue 按鈕也導向註冊表單的第一步
-    const targetPath = `${Routes.private.registrationForm}/1`;
+  const handleContinue = (meetingId?: number) => {
+    // Continue 按鈕也導向註冊表單的第一步，帶入 meetingId
+    const targetPath = meetingId
+      ? `${Routes.private.registrationForm}/1?meetingId=${meetingId}`
+      : `${Routes.private.registrationForm}/1`;
     router.push(targetPath);
   };
 
@@ -86,6 +91,7 @@ export const RegistrationCard: React.FC<RegistrationCardProps> = ({ data }) => {
               isPaymentComplete={data.is_payment_complete}
               isRegistered={data.is_registered}
               ticketNumber={data.ticket_number}
+              meetingId={data.meeting_id}
               onQRClick={() => setIsQRModalOpen(true)}
               onContinueClick={handleContinue}
               onRegisterClick={handleRegister}

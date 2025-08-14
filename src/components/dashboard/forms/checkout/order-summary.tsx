@@ -1,12 +1,11 @@
 import { Hr } from "@ui/splitter";
 import { SmallProfile } from "@ui/small-profile";
-import type { BuyerData } from "@/types";
 
-export const OrderSummary: React.FC<{ buyer: BuyerData }> = ({ buyer }) => {
+export const OrderSummary: React.FC = () => {
   return (
     <>
       <div className="text-xl text-black font-medium">Order Summary</div>
-      <SmallProfile buyer={buyer} />
+      <SmallProfile />
       <div className="flex gap-5 justify-between text-sm">
         <div>Total（Tax Included）</div>
         <div>$3,000 NTD</div>
