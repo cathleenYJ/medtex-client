@@ -32,7 +32,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
   
   // 先取得 getMeetingIdAsNumber，若無則從 URL search param 取得
   const { getMeetingIdAsNumber } = useMeetingId();
-  let meetingId: number | undefined = undefined;
+  let meetingId: number = 53;
   const idFromHook = getMeetingIdAsNumber();
   let paramId: string | null = null;
   if (typeof window !== 'undefined') {
@@ -174,53 +174,38 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     // Step 1: Update invoice information
     updateInvoice(processedData);
     
-    // Step 2: Use resolved meetingId for checkout
-    if (typeof meetingId === 'number' && !isNaN(meetingId)) {
-      callCheckoutAPI(meetingId, {
-        onSuccess: (response) => {
-          const checkoutData = response.data;
-          if (!checkoutData?.order_number) {
-            console.error("No order_number received from checkout API");
-            openModal(
-              <Message
-                title="Checkout Error"
-                closeModal={async () => {
-                  await closeModal();
-                  router.back();
-                }}
-              >
-                Invalid response from checkout API. Please try again.
-              </Message>
-            );
-            return;
-          }
-          // Step 3: Make payment with order_number from checkout response
-          makePaymentMutation({ 
-            gateway_id: 25, 
-            order_id: checkoutData.order_number, // Use order_number from checkout response as string
-            tax_id: processedData.tax_id,
-            tax_title: processedData.tax_title,
-            tax_email: processedData.tax_email
-          });
-        },
-        onError: (error) => {
-          console.error("Checkout API failed:", error);
+    // Step 2: Use resolved meetingId for checkout (fallback to 53)
+    callCheckoutAPI(meetingId, {
+      onSuccess: (response) => {
+        const checkoutData = response.data;
+        if (!checkoutData?.order_number) {
+          console.error("No order_number received from checkout API");
+          openModal(
+            <Message
+              title="Checkout Error"
+              closeModal={async () => {
+                await closeModal();
+                router.back();
+              }}
+            >
+              Invalid response from checkout API. Please try again.
+            </Message>
+          );
+          return;
         }
-      });
-    } else {
-      // meetingId 不存在，顯示錯誤
-      openModal(
-        <Message
-          title="Meeting ID Not Found"
-          closeModal={async () => {
-            await closeModal();
-            router.back();
-          }}
-        >
-          No meetingId found. Please return and select a meeting.
-        </Message>
-      );
-    }
+        // Step 3: Make payment with order_number from checkout response
+        makePaymentMutation({ 
+          gateway_id: 25, 
+          order_id: checkoutData.order_number, // Use order_number from checkout response as string
+          tax_id: processedData.tax_id,
+          tax_title: processedData.tax_title,
+          tax_email: processedData.tax_email
+        });
+      },
+      onError: (error) => {
+        console.error("Checkout API failed:", error);
+      }
+    });
   };
 
   const isPending = isInvoiceUpdating || isCheckoutPending || isPaymentPending || isProfileLoading;
