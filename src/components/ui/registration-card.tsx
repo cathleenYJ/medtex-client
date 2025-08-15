@@ -23,6 +23,7 @@ export interface RegistrationCardData {
   job_position?: string;
   mobile?: string;
   email?: string;
+  dietary?: string;
   register_time?: string;
   // 支付狀態
   is_payment_complete?: boolean;
@@ -62,8 +63,8 @@ export const RegistrationCard: React.FC<RegistrationCardProps> = ({ data }) => {
   const handleContinue = (meetingId?: number) => {
     // Continue 按鈕也導向註冊表單的第一步，帶入 meetingId
     const targetPath = meetingId
-      ? `${Routes.private.registrationForm}/1?meetingId=${meetingId}`
-      : `${Routes.private.registrationForm}/1`;
+      ? `${Routes.private.checkoutForm}/1?meetingId=${meetingId}`
+      : `${Routes.private.checkoutForm}/1`;
     router.push(targetPath);
   };
 

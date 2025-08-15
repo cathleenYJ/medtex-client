@@ -117,9 +117,33 @@ export type OrderMeetingDetailsResponse = {
       job_title: string;
       mobile_number: string | null;
       participant_email: string;
+      dietary_preferences: string | null;
     };
   } | null;
 };
+
+export type MeetingDetailsResponse = {
+  success: boolean;
+  status: string;
+  message: string;
+  data: Array<{
+    id: number;
+    title: string;
+    amount: number;
+    start_time: string;
+    end_time: string;
+    address: string;
+  }> | {
+    id: number;
+    title: string;
+    amount: number;
+    start_time: string;
+    end_time: string;
+    address: string;
+  } | null;
+};
+
+
 
 export type SaveWishlist = {
   item_name: string;

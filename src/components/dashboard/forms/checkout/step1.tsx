@@ -20,10 +20,8 @@ import type { PaymentData } from "@/types";
 import type { Session } from "next-auth";
 import { CheckoutSchema } from "./state";
 import { OrderSummary } from "./order-summary";
-import { ECPaySubmit } from "./ecpay-submit";
 import { PaymentConfirm } from "./payment-confirm";
 import { useInvoiceUpdate } from "./use-invoice-update";
-import { LoadingBlock } from "@dashboard/loading-block";
 
 export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
   const {
@@ -39,8 +37,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     const searchParams = new URLSearchParams(window.location.search);
     paramId = searchParams.get('meetingId');
   }
-  console.log('getMeetingIdAsNumber:', idFromHook);
-  console.log('URL search param meetingId:', paramId);
+  
   if (typeof idFromHook === 'number' && !isNaN(idFromHook)) {
     meetingId = idFromHook;
   } else if (paramId && !isNaN(Number(paramId))) {
@@ -59,7 +56,14 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     tax_title: "",
     tax_id: "",
   });
-  const [isFormReady, setIsFormReady] = useState(false);
+  const [, setIsFormReady] = useState(false);
+
+    // 根據 meetingId 請求 meetingDetails
+  const { data: meetingDetailsData, isLoading: isMeetingDetailsLoading } = useQuery({
+    queryKey: ["meeting-details", meetingId],
+    queryFn: () => fetchData.admin.meetingDetails(meetingId, session),
+    enabled: !!session?.user.adminToken && !!meetingId,
+  });
 
   // Fetch profile data to prefill form
   const { data: profileData, isLoading: isProfileLoading } = useQuery({
@@ -124,7 +128,6 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     // Use the new API endpoint for payme
     mutationKey: ["checkout"],
     mutationFn: (data: PaymentData) =>{
-  console.log("Payment request data:", data);
   return fetch("/api/transform/payment", {
     method: "POST",
     body: JSON.stringify(data),
@@ -147,15 +150,21 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
           </Message>
         );
       } else {
-        openModal(
-          <Message
-            title="Making Payment"
-            closeModal={closeModal}
-            btnCancel="Close"
-          >
-            <ECPaySubmit formHtml={formHtml} />
-          </Message>
-        );
+        // 參考 ECPaySubmit: 先 JSON.parse formHtml，再插入並自動提交
+        let html = "";
+        try {
+          html = JSON.parse(formHtml || "");
+        } catch {
+          html = formHtml;
+        }
+        const container = document.createElement("div");
+        container.style.display = "none";
+        container.innerHTML = html;
+        document.body.appendChild(container);
+        const form = container.querySelector("form");
+        if (form) {
+          form.submit();
+        }
       }
     },
   });
@@ -248,14 +257,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     );
   }, [shouldShowError]);
 
-  // Show loading block while waiting for all data to be ready
-  if (isProfileLoading || !isFormReady) {
-    return (
-      <div className="w-7xl max-w-full flex flex-col gap-5 text-black">
-        <LoadingBlock />
-      </div>
-    );
-  }
+  // 不再顯示 loading block，直接渲染表單
 
   return (
     <div
@@ -326,7 +328,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
           <button ref={submitRef} className="hidden" type="submit" />
         </Form>
         <div className="basis-full sm:basis-1/2 flex flex-col gap-5">
-          <OrderSummary/>
+          <OrderSummary meetingDetails={meetingDetailsData?.data} isLoading={isMeetingDetailsLoading} />
           <PaymentConfirm
             confirm={confirm}
             setConfirm={setConfirm}

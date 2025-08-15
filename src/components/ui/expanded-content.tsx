@@ -39,6 +39,7 @@ export const ExpandedContent: React.FC<ExpandedContentProps> = ({ data, onEdit }
             <DetailRow label="Job Position" value={data.job_position} />
             <DetailRow label="Mobile No." value={data.mobile} />
             <DetailRow label="Email" value={data.email} />
+            <DetailRow label="Dietary" value={data.dietary} />
           </DetailSection>
         </div>
 

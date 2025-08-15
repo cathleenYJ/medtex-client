@@ -32,6 +32,7 @@ import type {
   InvoiceUpdateResponse,
   ProfileApiResponse,
   OrderMeetingDetailsResponse,
+  MeetingDetailsResponse,
 } from "@/types";
 import type { SignupData, UserCredentials } from "@/components/auth";
 
@@ -351,6 +352,27 @@ class FetchData {
         )
         .catch((err) => {
           throw new Error(`Failed to fetch order meeting details\n${err}`);
+        }),
+    meetingDetails: (meetingId?: number, session: Session | null = null) =>
+      this.method
+        .get<MeetingDetailsResponse>(
+          `${API_ENDPOINTS.AUTH__MEETING_DETAILS}/${meetingId}`,
+          session,
+          "admin"
+        )
+        .catch((err) => {
+          throw new Error(`Failed to fetch meeting details\n${err}`);
+        }),
+    meetingsDetails: (meetingIds: number[], session: Session | null = null) =>
+      this.method
+        .post<any>(
+          API_ENDPOINTS.AUTH__MEETING_DETAILS,
+          typeof meetingIds === "string" ? { meeting_ids: meetingIds } : { meeting_ids: meetingIds },
+          session,
+          "admin"
+        )
+        .catch((err) => {
+          throw new Error(`Failed to fetch meetings details\n${err}`);
         }),
   };
 }

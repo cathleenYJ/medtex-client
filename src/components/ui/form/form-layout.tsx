@@ -1,3 +1,4 @@
+import { LoadingBlock } from "@dashboard/loading-block";
 import clsx from "clsx";
 
 export const FormLayout: React.FC<{
@@ -14,10 +15,11 @@ export const FormLayout: React.FC<{
       <div
         className={clsx(
           "flex gap-6 md:gap-15 py-10 px-5 sm:py-15 sm:px-20",
-          "rounded-4xl border border-transparent sm:border-white bg-white"
+          "rounded-4xl border border-transparent sm:border-white",
+          children ? "bg-white" : "bg-transparent"
         )}
       >
-        {children}
+        {children || <LoadingBlock />}
       </div>
     </div>
   </div>

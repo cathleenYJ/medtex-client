@@ -11,7 +11,7 @@ export const FormCompleted: React.FC<{ children?: React.ReactNode }> = ({
       <div className="flex flex-col-reverse xs:flex-row justify-end gap-5">
         <Button
           component={Link}
-          href={`${Routes.private.profileForm}/1`}
+          href={Routes.private.registrationRecord}
           variant="cancel"
           style={{ height: "42px", minWidth: "120px" }}
         >

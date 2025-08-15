@@ -2,7 +2,11 @@ import clsx from "clsx";
 import Image from "next/image";
 import { apiImageUrl } from "@/utils/api-image-url";
 
-export const SmallProfile: React.FC = () => (
+type SmallProfileProps = {
+  title?: string;
+};
+
+export const SmallProfile: React.FC<SmallProfileProps> = ({ title }) => (
   <div
     data-component-theme="green"
     className={clsx(
@@ -25,7 +29,7 @@ export const SmallProfile: React.FC = () => (
         Event Ticket
       </div>
       <div className="text-base font-normal text-black" style={{ fontSize: '16px', fontWeight: 400, lineHeight: '24px' }}>
-        MedXTech Summit Asia 2025
+        {title || "MedXTech"}
       </div>
     </div>
   </div>

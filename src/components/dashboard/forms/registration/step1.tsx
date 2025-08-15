@@ -8,11 +8,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Form, StepInfo } from "@ui/form";
 import { Button } from "@ui/button";
 import { Confirm } from "@ui/confirm";
-import { InfoCircle } from "@/components/icons/basic";
 import { fetchData } from "@/data/fetch-data";
 import { RegistrationFormSchema } from "./state";
 import { useParticipantUpdate } from "./use-participant-update";
-import { LoadingBlock } from "@dashboard/loading-block";
 import type { ParticipantData } from "@/types/participant";
 
 interface Step1Props {
@@ -76,14 +74,7 @@ export const Step1: React.FC<Step1Props> = ({
   // Use the new useParticipantUpdate hook (must be called before any return)
   const { isPending, updateParticipant } = useParticipantUpdate();
 
-  // Show loading block while waiting for all data to be ready
-  if (isLoading || !isFormReady) {
-    return (
-      <div className="flex flex-col gap-8 w-3xl max-w-full text-black/80">
-        <LoadingBlock />
-      </div>
-    );
-  }
+  // 不再顯示 loading block，直接渲染表單
 
   // 根據模式設定標題和按鈕文字
   const isEditMode = mode === 'edit';
@@ -241,23 +232,13 @@ export const Step1: React.FC<Step1Props> = ({
         },
       ] as Array<Record<string, unknown>>}
     >
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 w-full">
-        <div className="flex items-center justify-center sm:justify-start gap-2">
-          <InfoCircle className="w-4 h-4" />
-          <span 
-            style={{
-              fontSize: '14px',
-              fontWeight: 400,
-            }}
-          >
-            Locked 3 days before event
-          </span>
-        </div>
+      <div className="flex flex-col xs:flex-row w-full xs:justify-end gap-4">
         <Confirm cancelClick={() => router.back()}>
           <Button
             variant="auth"
             type="submit"
             loading={isPending || isLoading}
+            className="w-full xs:w-auto"
           >
             {buttonText}
           </Button>

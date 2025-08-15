@@ -15,7 +15,6 @@ import type { FormParams } from "@/types";
 import { fetchData } from "@/data/fetch-data";
 import { ProfileFormSchema } from "./state";
 import { useProfileUpdate } from "./use-profile-update";
-import { LoadingBlock } from "@dashboard/loading-block";
 
 export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
   const {
@@ -83,14 +82,6 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
       setIsFormReady(true);
     }
   }, [profileData, isLoading, user.email]);
-  // loading 狀態判斷（放在所有 hook 之後）
-  if (isLoading || !isFormReady) {
-    return (
-      <div className="flex flex-col gap-8 w-3xl max-w-full text-black/80">
-        <LoadingBlock />
-      </div>
-    );
-  }
 
   // Handle account type change and reset form
   const handleTypeChange = (type: "personal" | "corporate") => {

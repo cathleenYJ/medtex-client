@@ -11,8 +11,9 @@ import { RegistrationCard, RegistrationCardData } from "@ui/registration-card";
 import { fetchData } from "@/data/fetch-data";
 import { useMeetingId } from "@/hooks/use-meeting-id";
 
-type RegistrationTable = RegistrationCardData;
 
+// 擴充 RegistrationCardData 型別，加入 buttonLabel
+type RegistrationTable = RegistrationCardData;
 export default function RegistrationRecordPage() {
   const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,98 +23,157 @@ export default function RegistrationRecordPage() {
   const meetingId = getMeetingIdAsNumber();
   const safeMeetingId = meetingId ?? 0;
 
-  const { data: meetingDetailsData, isLoading: isMeetingDetailsLoading } = useQuery({
-    queryKey: ["meeting-details", meetingId],
-    queryFn: () => fetchData.admin.orderMeetingDetails(safeMeetingId, session),
+  // 先取得所有活動資訊
+  const { data: allMeetingsData, isLoading: isAllMeetingsLoading } = useQuery({
+    queryKey: ["all-meetings", meetingId],
+    queryFn: () => fetchData.admin.meetingDetails(safeMeetingId, session),
     enabled: !!session?.user.adminToken,
   });
+  // 取得所有活動 id 陣列
+  const meetingsArr = useMemo(() => {
+    if (allMeetingsData && allMeetingsData.status === "retrieved") {
+      // 優先取 meetings 屬性
+      if (allMeetingsData.data && Array.isArray((allMeetingsData.data as any).meetings)) {
+        return (allMeetingsData.data as any).meetings;
+      }
+      // 其次取 data 為陣列
+      if (Array.isArray(allMeetingsData.data)) {
+        return allMeetingsData.data;
+      }
+      // 最後取 data 為物件
+      if (allMeetingsData.data && typeof allMeetingsData.data === 'object') {
+        return [allMeetingsData.data];
+      }
+    }
+    return [];
+  }, [allMeetingsData]);
+
+  // 批量請求所有活動報名資料
+  const meetingIds = useMemo(() => meetingsArr.map((m: any) => m.id), [meetingsArr]);
+  const { data: batchOrderDetails, isLoading: isBatchLoading } = useQuery({
+    queryKey: ["order-meeting-details-batch", meetingIds],
+    queryFn: () => fetchData.admin.meetingsDetails(meetingIds, session),
+    enabled: !!session?.user.adminToken && meetingIds.length > 0 && !isAllMeetingsLoading,
+  });
+  const isLoading = isAllMeetingsLoading || isBatchLoading;
 
   // 轉換 API 資料為 RegistrationCardData 格式
   const registrationData: RegistrationTable[] = useMemo(() => {
-    if (!meetingDetailsData || meetingDetailsData.status !== "retrieved" || !meetingDetailsData.data) {
-      return [];
+    // 取得所有報名資料
+    const registrationMap = new Map<number, { orders: any[]; payment_history: any[]; participant_details: any }>();
+    // API 回傳格式：{ success, status, message, data: Array }
+    const meetingBlocks = batchOrderDetails?.data ?? [];
+    if (Array.isArray(meetingBlocks)) {
+      meetingBlocks.forEach((meetingBlock: any) => {
+        const { orders, payment_history, participant_details, meeting_details: oldMeetingDetails } = meetingBlock;
+        if (oldMeetingDetails && oldMeetingDetails.id !== undefined) {
+          const key = Number(oldMeetingDetails.id);
+          registrationMap.set(key, { orders, payment_history, participant_details });
+        }
+      });
     }
-    // 支援 data 為 array（多會議）或 object（單一會議）
-    const dataArray = Array.isArray(meetingDetailsData.data)
-      ? meetingDetailsData.data
-      : [meetingDetailsData.data];
 
+    // 渲染所有活動卡片
     const allItems: RegistrationTable[] = [];
     let globalIndex = 0;
-    dataArray.forEach((meetingBlock) => {
-      const { orders, meeting_details, payment_history, participant_details } = meetingBlock as {
-        orders: Array<{ id: number; status: string; amount: number; merchant_trade_no?: string }>;
-        meeting_details: { id: number; start_time: string; end_time: string; title: string; address: string };
-        payment_history: Array<{ order_id: number; invoice_date?: number; invoice_number?: string }>;
-        participant_details: {
-          participant_full_name: string;
-          job_title: string;
-          mobile_number?: string;
-          participant_email: string;
-        };
-      };
-      orders.forEach((order) => {
-        const paymentInfo = payment_history.find((payment) => payment.order_id === order.id);
-        const startDateTime = new Date(meeting_details.start_time);
-        const meetingDate = startDateTime.toISOString().split('T')[0];
-        let registrationDate = meetingDate;
-        let registerTime = "-";
-        if (paymentInfo?.invoice_date) {
-          const invoiceDate = new Date(paymentInfo.invoice_date * 1000);
-          registrationDate = invoiceDate.toISOString().split('T')[0];
-          registerTime = invoiceDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+    meetingsArr.forEach((meeting: any) => {
+      const regData = registrationMap.get(Number(meeting.id));
+      // 安全取得活動開始時間
+      let startDateTime: Date | null = null;
+      let meetingDate: string = "-";
+      if (meeting.start_time) {
+        const d = new Date(meeting.start_time);
+        if (!isNaN(d.getTime())) {
+          startDateTime = d;
+          meetingDate = d.toISOString().split('T')[0];
+        }
+      }
+      if (regData && regData.orders.length > 0) {
+        regData.orders.forEach((order: any) => {
+          const paymentInfo = regData.payment_history.find((payment: any) => payment.order_id === order.id);
+          let registrationDate = meetingDate;
+          let registerTime = "-";
+          if (paymentInfo?.invoice_date) {
+            const invoiceDate = new Date(paymentInfo.invoice_date * 1000);
+            if (!isNaN(invoiceDate.getTime())) {
+              registrationDate = invoiceDate.toISOString().split('T')[0];
+              registerTime = invoiceDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            }
+          }
+          // 只要有訂單資料就設為已報名
+          let isRegistered = true;
+          let isPaymentComplete = false;
+          // payment_status 決定 isPaymentComplete
+          if (paymentInfo?.payment_status === "paid") {
+            isPaymentComplete = true;
+          } else {
+            isPaymentComplete = false;
+          }
+          const capitalizeStatus = (status: string) => {
+            return status.charAt(0).toUpperCase() + status.slice(1);
+          };
+          allItems.push({
+            no: ++globalIndex,
+            event_name: <ExternalLink onClick={() => {}}>{meeting.title ?? ""}</ExternalLink>,
+            registration_date: registrationDate,
+            start_time: meeting.start_time ?? "",
+            end_time: meeting.end_time ?? "",
+            status: capitalizeStatus(order.status),
+            participant_name: regData.participant_details.participant_full_name,
+            company: "-",
+            note: order.status === "fail" ? "付款失敗" : "-",
+            price: `NT$${order.amount}`,
+            invoice: paymentInfo?.invoice_number || "Pending",
+            job_position: regData.participant_details.job_title,
+            mobile: regData.participant_details.mobile_number || "-",
+            email: regData.participant_details.participant_email,
+            dietary: regData.participant_details.dietary_preferences || "-",
+            register_time: registerTime,
+            is_registered: isRegistered,
+            is_payment_complete: isPaymentComplete,
+            ticket_number: order.merchant_trade_no || `-`,
+            meeting_title: meeting.title ?? "",
+            meeting_address: meeting.address ?? "",
+            meeting_id: meeting.id ?? 0,
           });
-        }
-        let isRegistered = false;
-        let isPaymentComplete = false;
-        if (order.status === "paid") {
-          isRegistered = true;
-          isPaymentComplete = true;
-        } else if (order.status === "pending" || order.status === "paying") {
-          isRegistered = true;
-          isPaymentComplete = false;
-        } else if (order.status === "fail") {
-          isRegistered = true;
-          isPaymentComplete = false;
-        }
-        const capitalizeStatus = (status: string) => {
-          return status.charAt(0).toUpperCase() + status.slice(1);
-        };
-        const registrationItem: RegistrationTable = {
+        });
+      } else {
+        // 未報名活動卡片
+        allItems.push({
           no: ++globalIndex,
-          event_name: <ExternalLink onClick={() => {}}>{meeting_details.title}</ExternalLink>,
-          registration_date: registrationDate,
-          start_time: meeting_details.start_time,
-          end_time: meeting_details.end_time,
-          status: capitalizeStatus(order.status),
-          participant_name: participant_details.participant_full_name,
+          event_name: <ExternalLink onClick={() => {}}>{meeting.title ?? ""}</ExternalLink>,
+          registration_date: meetingDate,
+          start_time: meeting.start_time ?? "",
+          end_time: meeting.end_time ?? "",
+          status: "Not Registered",
+          participant_name: "-",
           company: "-",
-          note: order.status === "fail" ? "付款失敗" : "-",
-          price: `NT$${order.amount}`,
-          invoice: paymentInfo?.invoice_number || "Pending",
-          job_position: participant_details.job_title,
-          mobile: participant_details.mobile_number || "-",
-          email: participant_details.participant_email,
-          register_time: registerTime,
-          is_registered: isRegistered,
-          is_payment_complete: isPaymentComplete,
-          ticket_number: order.merchant_trade_no || `-`,
-          meeting_title: meeting_details.title,
-          meeting_address: meeting_details.address,
-          meeting_id: meeting_details.id,
-        };
-        allItems.push(registrationItem);
-      });
+          note: "-",
+          price: "-",
+          invoice: "-",
+          job_position: "-",
+          mobile: "-",
+          email: "-",
+          register_time: "-",
+          is_registered: false,
+          is_payment_complete: false,
+          ticket_number: "-",
+          meeting_title: meeting.title ?? "",
+          meeting_address: meeting.address ?? "",
+          meeting_id: meeting.id ?? 0,
+        });
+      }
     });
     return allItems;
-  }, [meetingDetailsData]);
+  }, [batchOrderDetails, meetingsArr]);
 
-  const isLoading = isMeetingDetailsLoading;
+  // ...existing code...
 
   // 根據 tab 分類資料 - 基於 meeting_details.start_time
   const { upcomingData, completedData } = useMemo(() => {

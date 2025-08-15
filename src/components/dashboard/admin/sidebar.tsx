@@ -24,7 +24,7 @@ export const Sidebar: React.FC<{ className?: string }> = ({ className }) => {
       items: [
         // { label: "Overview", href: "/admin" },
         { label: "Registration Record", href: "/admin/registration-record" },
-        { label: "Payment History", href: "/admin/payment-history" },
+        // { label: "Payment History", href: "/admin/payment-history" },
       ]
     }
   ];

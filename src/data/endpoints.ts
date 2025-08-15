@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
   AUTH_UPDATE_INVOICE_INFO: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/profile-setting/invoice-info`,
   AUTH_PROFILE_DATA: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/profile-setting/data`,
   AUTH_ORDER_MEETING_DETAILS: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/orders/meeting`,
+  AUTH__MEETING_DETAILS: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/orders/meetings/details`,
   //   Dev apis
   RECOMMENDED: `${ConfigValue.NEXT_PUBLIC_DEV_REST_API_ENDPOINT}/api/recommended`,
   ADMIN_SIDEBAR: `${ConfigValue.NEXT_PUBLIC_DEV_REST_API_ENDPOINT}/api/admin-sidebar`,

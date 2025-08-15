@@ -45,7 +45,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
     );
   }
 
-  if (isRegistered) {
+  if (isRegistered && !isPaymentComplete) {
     // 已註冊但未付款 - 顯示 Continue 按鈕
     return (
       <Button

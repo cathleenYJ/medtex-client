@@ -8,7 +8,7 @@ export const Final: React.FC = () => {
       <StepInfo
         title="Account Created!"
         nextPage={
-          <Link href={Routes.public.home}>
+          <Link href={Routes.private.registrationRecord}>
             → Go back to homepage to find more events
           </Link>
         }
