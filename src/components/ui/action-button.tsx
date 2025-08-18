@@ -26,7 +26,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
     return (
       <button 
         onClick={onQRClick}
-        className="flex sm:p-1.5 sm:px-2.5 p-[6px] px-[10px] justify-start items-center sm:gap-2.5 gap-[10px] rounded-md border border-medtex-gray bg-white hover:bg-gray-50 transition-colors sm:w-auto sm:flex-none flex-1 sm:h-10 h-[40px]"
+    className="flex sm:p-1.5 sm:px-2.5 p-[6px] px-[10px] justify-start items-center sm:gap-2.5 gap-[10px] rounded-md border border-medtex-gray bg-white hover:bg-gray-50 transition-colors sm:w-auto sm:flex-none flex-1 sm:h-[56px] h-[40px]"
       >
         <div className="flex items-center gap-2">
           <div className="w-[32px] h-[32px] flex-shrink-0 aspect-square bg-gray-100 rounded flex items-center justify-center self-center">
