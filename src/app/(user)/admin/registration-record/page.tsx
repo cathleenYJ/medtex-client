@@ -8,9 +8,9 @@ import { Tabs, TabItem } from "@ui/tabs";
 import { ExternalLink } from "@ui/external-link";
 import { LoadingBlock } from "@dashboard/loading-block";
 import { RegistrationCard, RegistrationCardData } from "@ui/registration-card";
+import type { OrderMeetingDetailsResponse } from "@/types/admin";
 import { fetchData } from "@/data/fetch-data";
 import { useMeetingId } from "@/hooks/use-meeting-id";
-
 
 // 擴充 RegistrationCardData 型別，加入 buttonLabel
 type RegistrationTable = RegistrationCardData;
@@ -30,67 +30,70 @@ export default function RegistrationRecordPage() {
     enabled: !!session?.user.adminToken,
   });
   // 取得所有活動 id 陣列
-  const meetingsArr = useMemo(() => {
-    if (allMeetingsData && allMeetingsData.status === "retrieved") {
-      // 優先取 meetings 屬性
-      if (allMeetingsData.data && Array.isArray((allMeetingsData.data as any).meetings)) {
-        return (allMeetingsData.data as any).meetings;
+  const meetingsArr = useMemo((): Array<{ id: number; title: string; amount: number; start_time: string; end_time: string; address: string }> => {
+    if (!allMeetingsData) return [];
+    // 支援 { data: { meetings: [...] } } 結構
+    if (
+      typeof allMeetingsData === "object" &&
+      "data" in allMeetingsData &&
+      allMeetingsData.data &&
+      typeof allMeetingsData.data === "object"
+    ) {
+      const dataObj = allMeetingsData.data as Record<string, unknown>;
+      if (
+        "meetings" in dataObj &&
+        Array.isArray((dataObj.meetings))
+      ) {
+        return dataObj.meetings as Array<{ id: number; title: string; amount: number; start_time: string; end_time: string; address: string }>;
       }
-      // 其次取 data 為陣列
       if (Array.isArray(allMeetingsData.data)) {
-        return allMeetingsData.data;
+        return allMeetingsData.data as Array<{ id: number; title: string; amount: number; start_time: string; end_time: string; address: string }>;
       }
-      // 最後取 data 為物件
-      if (allMeetingsData.data && typeof allMeetingsData.data === 'object') {
-        return [allMeetingsData.data];
-      }
+    }
+    // 支援直接回傳陣列
+    if (Array.isArray(allMeetingsData)) {
+      return allMeetingsData as Array<{ id: number; title: string; amount: number; start_time: string; end_time: string; address: string }>;
     }
     return [];
   }, [allMeetingsData]);
 
   // 批量請求所有活動報名資料
-  const meetingIds = useMemo(() => meetingsArr.map((m: any) => m.id), [meetingsArr]);
+  const meetingIds = useMemo(() => meetingsArr.map((m) => m.id), [meetingsArr]);
   const { data: batchOrderDetails, isLoading: isBatchLoading } = useQuery({
     queryKey: ["order-meeting-details-batch", meetingIds],
     queryFn: () => fetchData.admin.meetingsDetails(meetingIds, session),
     enabled: !!session?.user.adminToken && meetingIds.length > 0 && !isAllMeetingsLoading,
   });
   const isLoading = isAllMeetingsLoading || isBatchLoading;
-
   // 轉換 API 資料為 RegistrationCardData 格式
   const registrationData: RegistrationTable[] = useMemo(() => {
     // 取得所有報名資料
-    const registrationMap = new Map<number, { orders: any[]; payment_history: any[]; participant_details: any }>();
-    // API 回傳格式：{ success, status, message, data: Array }
+    const registrationMap = new Map<number, OrderMeetingDetailsResponse | null>();
+    // API 回傳格式：Array<OrderMeetingDetailsResponse>
     const meetingBlocks = batchOrderDetails?.data ?? [];
     if (Array.isArray(meetingBlocks)) {
-      meetingBlocks.forEach((meetingBlock: any) => {
-        const { orders, payment_history, participant_details, meeting_details: oldMeetingDetails } = meetingBlock;
-        if (oldMeetingDetails && oldMeetingDetails.id !== undefined) {
-          const key = Number(oldMeetingDetails.id);
-          registrationMap.set(key, { orders, payment_history, participant_details });
-        }
+      meetingBlocks.forEach((meetingBlock) => {
+        // meetingBlock 就是 OrderMeetingDetailsResponse | null
+        const key = Number(meetingBlock?.meeting_details?.id);
+        registrationMap.set(key, meetingBlock);
       });
     }
 
     // 渲染所有活動卡片
     const allItems: RegistrationTable[] = [];
     let globalIndex = 0;
-    meetingsArr.forEach((meeting: any) => {
-      const regData = registrationMap.get(Number(meeting.id));
-      // 安全取得活動開始時間
-      let startDateTime: Date | null = null;
+    meetingsArr.forEach((meeting) => {
+      const regData = registrationMap.get(meeting.id);
       let meetingDate: string = "-";
       if (meeting.start_time) {
         const d = new Date(meeting.start_time);
         if (!isNaN(d.getTime())) {
-          startDateTime = d;
           meetingDate = d.toISOString().split('T')[0];
         }
       }
-      if (regData && regData.orders.length > 0) {
-        regData.orders.forEach((order: any) => {
-          const paymentInfo = regData.payment_history.find((payment: any) => payment.order_id === order.id);
+      if (regData && regData.orders && regData.orders.length > 0) {
+        regData.orders.forEach((order) => {
+          const paymentInfo = regData.payment_history?.find((payment) => payment.order_id === order.id);
           let registrationDate = meetingDate;
           let registerTime = "-";
           if (paymentInfo?.invoice_date) {
@@ -107,7 +110,7 @@ export default function RegistrationRecordPage() {
             }
           }
           // 只要有訂單資料就設為已報名
-          let isRegistered = true;
+          const isRegistered = true;
           let isPaymentComplete = false;
           // payment_status 決定 isPaymentComplete
           if (paymentInfo?.payment_status === "paid") {
@@ -125,15 +128,15 @@ export default function RegistrationRecordPage() {
             start_time: meeting.start_time ?? "",
             end_time: meeting.end_time ?? "",
             status: capitalizeStatus(order.status),
-            participant_name: regData.participant_details.participant_full_name,
+            participant_name: regData.participant_details?.participant_full_name ?? "-",
             company: "-",
             note: order.status === "fail" ? "付款失敗" : "-",
             price: `NT$${order.amount}`,
             invoice: paymentInfo?.invoice_number || "Pending",
-            job_position: regData.participant_details.job_title,
-            mobile: regData.participant_details.mobile_number || "-",
-            email: regData.participant_details.participant_email,
-            dietary: regData.participant_details.dietary_preferences || "-",
+            job_position: regData.participant_details?.job_title ?? "-",
+            mobile: regData.participant_details?.mobile_number || "-",
+            email: regData.participant_details?.participant_email ?? "-",
+            dietary: regData.participant_details?.dietary_preferences || "-",
             register_time: registerTime,
             is_registered: isRegistered,
             is_payment_complete: isPaymentComplete,

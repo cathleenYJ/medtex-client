@@ -86,62 +86,56 @@ export type DialogProfile = {
 
 // Order Meeting Details API Types
 export type OrderMeetingDetailsResponse = {
-  success: boolean;
-  status: string;
-  message: string;
-  data: {
-    orders: Array<{
+  orders: Array<{
+    id: number;
+    status: string;
+    meeting_id: string;
+    merchant_trade_no: string | null;
+    order_item_id: number;
+    amount: number;
+  }>;
+  meeting_details: {
+    id: number;
+    title: string;
+    start_time: string;
+    end_time: string;
+    address: string;
+  };
+  payment_history: Array<{
+    order_id: number;
+    payment_status: string;
+    invoice_number?: string | null;
+    total_amount?: string;
+    merchant_trade_no?: string;
+    invoice_date?: number;
+  }>;
+  participant_details: {
+    participant_full_name: string;
+    job_title: string;
+    mobile_number: string | null;
+    participant_email: string;
+    dietary_preferences: string | null;
+  };
+} | null;
+
+export type MeetingDetailsResponse =
+  | Array<{
       id: number;
-      status: string;
-      meeting_id: string;
-      merchant_trade_no: string | null;
-      order_item_id: number;
-      amount: number;
-    }>;
-    meeting_details: {
       title: string;
+      amount: number;
       start_time: string;
       end_time: string;
       address: string;
-    };
-    payment_history: Array<{
-      order_id: number;
-      payment_status: string;
-      invoice_number?: string | null;
-      total_amount?: string;
-      merchant_trade_no?: string;
-      invoice_date?: number;
-    }>;
-    participant_details: {
-      participant_full_name: string;
-      job_title: string;
-      mobile_number: string | null;
-      participant_email: string;
-      dietary_preferences: string | null;
-    };
-  } | null;
-};
-
-export type MeetingDetailsResponse = {
-  success: boolean;
-  status: string;
-  message: string;
-  data: Array<{
-    id: number;
-    title: string;
-    amount: number;
-    start_time: string;
-    end_time: string;
-    address: string;
-  }> | {
-    id: number;
-    title: string;
-    amount: number;
-    start_time: string;
-    end_time: string;
-    address: string;
-  } | null;
-};
+    }>
+  | {
+      id: number;
+      title: string;
+      amount: number;
+      start_time: string;
+      end_time: string;
+      address: string;
+    }
+  | null;
 
 
 

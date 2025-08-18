@@ -33,7 +33,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
     businessId: "",
     companyAddress: "",
   });
-  const [isFormReady, setIsFormReady] = useState(false);
+  const [, setIsFormReady] = useState(false);
   // Fetch profile data to prefill form
   const { data: profileData, isLoading } = useQuery({
     queryKey: ["profile-data"],

@@ -35,7 +35,7 @@ export const Step1: React.FC<Step1Props> = ({
     companyName: "",
     companyNameChinese: "",
   });
-  const [isFormReady, setIsFormReady] = useState(false);
+  const [, setIsFormReady] = useState(false);
 
   // Fetch profile data to prefill form
   const { data: profileData, isLoading } = useQuery({

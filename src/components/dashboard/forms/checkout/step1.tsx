@@ -328,7 +328,7 @@ export const Step1: React.FC<{ user: Session["user"] }> = ({ user }) => {
           <button ref={submitRef} className="hidden" type="submit" />
         </Form>
         <div className="basis-full sm:basis-1/2 flex flex-col gap-5">
-          <OrderSummary meetingDetails={meetingDetailsData?.data} isLoading={isMeetingDetailsLoading} />
+          <OrderSummary meetingDetails={meetingDetailsData ?? undefined} isLoading={isMeetingDetailsLoading} />
           <PaymentConfirm
             confirm={confirm}
             setConfirm={setConfirm}

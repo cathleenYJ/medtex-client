@@ -365,7 +365,7 @@ class FetchData {
         }),
     meetingsDetails: (meetingIds: number[], session: Session | null = null) =>
       this.method
-        .post<any>(
+        .post<ApiResponse<OrderMeetingDetailsResponse[]>>(
           API_ENDPOINTS.AUTH__MEETING_DETAILS,
           typeof meetingIds === "string" ? { meeting_ids: meetingIds } : { meeting_ids: meetingIds },
           session,

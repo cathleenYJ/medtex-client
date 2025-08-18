@@ -1,16 +1,31 @@
 import { Hr } from "@ui/splitter";
 import { SmallProfile } from "@ui/small-profile";
+import type { MeetingDetailsResponse } from "@/types";
 
 type Props = {
-  meetingDetails?: any;
+  meetingDetails?: MeetingDetailsResponse | undefined;
   isLoading?: boolean;
 };
 
 export const OrderSummary: React.FC<Props> = ({ meetingDetails, isLoading }) => {
-  // 取出 meeting_details
-  const details = meetingDetails?.meeting_details || {};
-  const title = details.title || "-";
-  const price = details.amount != null ? details.amount : 3000;
+  let details: MeetingDetailsResponse = null;
+  if (Array.isArray(meetingDetails)) {
+    details = meetingDetails[0] || null;
+  } else if (
+    meetingDetails &&
+    typeof meetingDetails === "object" &&
+    "data" in meetingDetails &&
+    meetingDetails.data &&
+    typeof meetingDetails.data === "object" &&
+    "meeting_details" in meetingDetails.data &&
+    meetingDetails.data.meeting_details
+  ) {
+    details = meetingDetails.data.meeting_details as MeetingDetailsResponse;
+  } else if (meetingDetails && typeof meetingDetails === "object") {
+    details = meetingDetails as MeetingDetailsResponse;
+  }
+  const title = (details && 'title' in details && details.title) ? details.title : "-";
+  const price = (details && 'amount' in details && details.amount != null) ? details.amount : 3000;
 
   return (
     <>
