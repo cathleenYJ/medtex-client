@@ -176,8 +176,6 @@ export default function RegistrationRecordPage() {
     return allItems;
   }, [batchOrderDetails, meetingsArr]);
 
-  // ...existing code...
-
   // 根據 tab 分類資料 - 基於 meeting_details.start_time
   const { upcomingData, completedData } = useMemo(() => {
     const currentDate = new Date();
@@ -239,11 +237,13 @@ export default function RegistrationRecordPage() {
   const renderTable = (tabData: RegistrationTable[]) => {
     const filteredData = getFilteredData(tabData);
     
+    // 判斷是否為 Previous Event tab
+    const isPreviousEvent = tabData === completedData;
     return (
       <div className="space-y-4">
         {filteredData?.length > 0 ? (
           filteredData.map((item, index) => (
-            <RegistrationCard key={index} data={item} />
+            <RegistrationCard key={index} data={{ ...item, is_previous_event: isPreviousEvent }} />
           ))
         ) : (
           <div className="text-center text-gray-500 py-8">

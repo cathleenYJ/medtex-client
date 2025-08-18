@@ -10,6 +10,7 @@ interface ActionButtonProps {
   onQRClick?: () => void;
   onContinueClick?: (meetingId?: number) => void;
   onRegisterClick?: (meetingId?: number) => void;
+  disabled?: boolean;
 }
 
 export const ActionButton: React.FC<ActionButtonProps> = ({
@@ -19,8 +20,10 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   meetingId,
   onQRClick,
   onContinueClick,
-  onRegisterClick
+  onRegisterClick,
+  disabled
 }) => {
+  const isDisabled = disabled ?? false;
   if (isPaymentComplete) {
     // 已完成付款 - 顯示 QR Code
     return (
@@ -47,25 +50,27 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 
   if (isRegistered && !isPaymentComplete) {
     // 已註冊但未付款 - 顯示 Continue 按鈕
-    return (
-      <Button
-        variant="auth"
-        className="sm:!w-[130px] sm:!h-auto !h-10 sm:flex-none flex-1"
-        onClick={() => onContinueClick?.(meetingId)}
-      >
-        Continue
-      </Button>
-    );
+     return (
+       <Button
+         variant="auth"
+         className="sm:!w-[130px] sm:!h-auto !h-10 sm:flex-none flex-1"
+         onClick={() => onContinueClick?.(meetingId)}
+         disabled={isDisabled}
+       >
+         Continue
+       </Button>
+     );
   }
 
   // 未註冊 - 顯示 Register 按鈕
-  return (
-    <Button
-      variant="auth"
-      className="sm:!w-[130px] sm:!h-auto !h-10 sm:flex-none flex-1"
-      onClick={() => onRegisterClick?.(meetingId)}
-    >
-      Register
-    </Button>
-  );
+   return (
+     <Button
+       variant="auth"
+       className="sm:!w-[130px] sm:!h-auto !h-10 sm:flex-none flex-1"
+       onClick={() => onRegisterClick?.(meetingId)}
+       disabled={isDisabled}
+     >
+       Register
+     </Button>
+   );
 };

@@ -35,6 +35,8 @@ export interface RegistrationCardData {
   meeting_title?: string;
   meeting_address?: string;
   meeting_id?: number;
+  // 是否為 Previous Event
+  is_previous_event?: boolean;
 }
 
 interface RegistrationCardProps {
@@ -96,6 +98,7 @@ export const RegistrationCard: React.FC<RegistrationCardProps> = ({ data }) => {
               onQRClick={() => setIsQRModalOpen(true)}
               onContinueClick={handleContinue}
               onRegisterClick={handleRegister}
+              disabled={!!data.is_previous_event}
             />
             
             {/* 展開按鈕 */}
