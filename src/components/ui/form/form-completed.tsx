@@ -8,7 +8,7 @@ export const FormCompleted: React.FC<{ children?: React.ReactNode }> = ({
   return (
     <div className="px-4 sm:px-11 md:px-20 py-15 flex flex-col gap-10 w-3xl max-w-full text-white/80">
       {children}
-      <div className="flex flex-col-reverse xs:flex-row justify-end gap-5">
+      <div className="flex flex-col-reverse xs:flex-row justify-between gap-5">
         <Button
           component={Link}
           href={Routes.private.registrationRecord}
