@@ -16,6 +16,7 @@ export const Routes = {
     meetingFlow: "/documents/meeting-flow",
     terms: "/documents/terms-and-conditions",
     privacy: "/documents/privacy-policy",
+    dataCollection: "/documents/data-collection-privacy",
   },
   private: {
     admin: "/admin",
@@ -23,7 +24,6 @@ export const Routes = {
     appointments: "/admin/appointments",
     wishlist: "/admin/wishlist",
     registrationRecord: "/admin/registration-record",
-    paymentHistory: "/admin/payment-history",
     profile: "/admin/profile",
     makeAppointment: "/admin/make-appointment",
     profileForm: "/forms/profile/2",

@@ -61,19 +61,10 @@ export const ConfigValue = {
     "50m_1b": "$50-100 million",
     over_1b: "Over $1 billion",
   },
-  PRIVILEGES: {
-    buyer: {
-      // admin: Routes.private.registrationForm,
-      // matchmaking: Routes.private.matchmaking,
-      // appointments: Routes.private.appointments,
-    },
-    seller: {
-      // admin: Routes.private.registrationForm,
-      // matchmaking: Routes.private.matchmaking,
-      // appointments: Routes.private.appointments,
-      // wishlist: Routes.private.wishlist,
-      registrationRecord: Routes.private.registrationRecord,
-      paymentHistory: Routes.private.paymentHistory,
-    },
-  },
+  PRIVILEGES: [
+    Routes.private.checkoutForm,
+    Routes.private.registrationForm,
+    Routes.private.profileForm,
+    Routes.private.registrationRecord,
+  ],
 };

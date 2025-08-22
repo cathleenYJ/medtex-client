@@ -10,8 +10,8 @@ import type { SidebarItem } from "@/types";
 import { iconViews } from "./icon-views";
 
 const privileges = (role: number, pathname: string) => {
-  const roleName = role === ConfigValue.ROLES.buyer ? "buyer" : "seller";
-  return Object.values(ConfigValue.PRIVILEGES[roleName]).includes(pathname);
+  // 不分角色，直接用 PRIVILEGES 陣列
+  return ConfigValue.PRIVILEGES.includes(pathname);
 };
 
 export const Sidebar: React.FC<{ className?: string }> = ({ className }) => {
@@ -24,7 +24,6 @@ export const Sidebar: React.FC<{ className?: string }> = ({ className }) => {
       items: [
         // { label: "Overview", href: "/admin" },
         { label: "Registration Record", href: "/admin/registration-record" },
-        // { label: "Payment History", href: "/admin/payment-history" },
       ]
     }
   ];

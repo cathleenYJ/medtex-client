@@ -23,7 +23,6 @@ export const ForgetPassword = () => {
     mutationFn: (data: ForgetPasswordData) =>
       fetchData.auth.foretPassword(data, null),
     onSuccess: (res) => {
-      if (res.success) {
         openModal(
           <Message
             title="Recovery Link Sent"
@@ -36,9 +35,9 @@ export const ForgetPassword = () => {
             {res.message}
           </Message>
         );
-      } else {
-        openModal(<Message closeModal={closeModal}>{res.message}</Message>);
-      }
+    },
+    onError: (err: Error) => {
+      openModal(<Message closeModal={closeModal}>{err.message}</Message>);
     },
   });
 

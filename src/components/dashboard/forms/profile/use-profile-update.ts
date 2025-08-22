@@ -39,22 +39,25 @@ export const useProfileUpdate = (selectedType: "personal" | "corporate" | null, 
     // Prepare the API payload based on the selected account type
     const apiData: ProfileData = {
       account_type: selectedType,
+      contact_email: data.contact_email ?? "",
+      address: data.address ?? "",
+      first_name: data.first_name ?? "",
+      last_name: data.last_name ?? "",
+      company_name: data.companyName ?? "",
+      company_name_zh: data.companyNameChinese ?? "",
+      business_id: data.businessId ?? "",
+      company_address: data.companyAddress ?? ""
     };
 
-    // Add common fields
-    // Send contact_email to backend as contact_email field (not email)
-    if (data.contact_email) apiData.contact_email = data.contact_email;
-    if (data.address) apiData.address = data.address;
-
-    // Add type-specific fields
+    // 清空另一型別獨有欄位
     if (selectedType === "personal") {
-      if (data.first_name) apiData.first_name = data.first_name;
-      if (data.last_name) apiData.last_name = data.last_name;
+      apiData.company_name = "";
+      apiData.company_name_zh = "";
+      apiData.business_id = "";
+      apiData.company_address = "";
     } else if (selectedType === "corporate") {
-      if (data.companyName) apiData.company_name = data.companyName;
-      if (data.companyNameChinese) apiData.company_name_zh = data.companyNameChinese;
-      if (data.businessId) apiData.business_id = data.businessId;
-      if (data.companyAddress) apiData.company_address = data.companyAddress;
+      apiData.first_name = "";
+      apiData.last_name = "";
     }
     updateProfileInfo(apiData);
   };

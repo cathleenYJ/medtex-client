@@ -2,17 +2,20 @@ import { redirect } from "next/navigation";
 import { CredentialsSignin } from "@/components/auth";
 import { auth } from "@lib/nextauth/auth";
 import { SiteLogoForm } from "@/components/icons/site-logo-form";
-import { Routes } from "@/config/routes";
 
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ callbackUrl?: string }>;
+  searchParams: Promise<{
+    callbackUrl?: string;
+    message?: string;
+    error?: string;
+  }>;
 }) {
   const search = await searchParams;
   const session = await auth();
   if (session) {
-    redirect(search?.callbackUrl ?? Routes.private.registrationRecord);
+    redirect(search?.callbackUrl ?? "/");
   }
   return (
     <div className="flex flex-col items-center w-full">
@@ -24,7 +27,7 @@ export default async function SignInPage({
           <div className="w-full flex justify-center">
             <div className="h-px bg-[#13131433] w-full max-w-90 sm:max-w-[480px]" />
           </div>
-          <CredentialsSignin redirectTo={search?.callbackUrl ?? Routes.private.registrationRecord} />
+          <CredentialsSignin redirectTo={search?.callbackUrl ?? "/"} />
         </div>
   );
 }

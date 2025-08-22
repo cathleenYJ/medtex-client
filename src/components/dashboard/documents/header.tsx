@@ -20,7 +20,8 @@ const headersData = {
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
-  const { documentType, title } = headersData[pathname];
+  const header = headersData[pathname] || { documentType: "", title: "" };
+  const { documentType, title } = header;
   return (
     <div className="w-full px-4 sm:px-10 pt-11 pb-21">
       <div className="w-7xl max-w-full mx-auto">

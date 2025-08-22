@@ -37,27 +37,24 @@ export const ResetPassword: React.FC = () => {
   const { isPending, mutate } = useMutation({
     mutationKey: ["reset-password"],
     mutationFn: (data: ResetPasswordData) =>
-      fetchData.auth
-        .resetPassword(token as string, data, null)
-        .catch((err) => ({ success: false, message: err.message })),
-    onSuccess: (res) => {
-      if (res.success) {
-        openModal(
-          <Message
-            icon={<CheckFat className="size-12" />}
-            title="Successful Password Reset"
-            btnCancel="Login"
-            closeModal={async () => {
-              await closeModal();
-              router.push(Routes.auth.signIn);
-            }}
-          >
-            You can now use your new password to login to your account.
-          </Message>
-        );
-      } else {
-        openModal(<Message closeModal={closeModal}>{res.message}</Message>);
-      }
+      fetchData.auth.resetPassword(token as string, data, null),
+    onSuccess: () => {
+      openModal(
+        <Message
+          icon={<CheckFat className="size-12" />}
+          title="Password Successfully Reset"
+          btnCancel="Login"
+          closeModal={async () => {
+            await closeModal();
+            router.push(Routes.auth.signIn);
+          }}
+        >
+          You can now use your new password to login to your account.
+        </Message>
+      );
+    },
+    onError: (err) => {
+      openModal(<Message closeModal={closeModal}>{err.message}</Message>);
     },
   });
   const email = searchParams.get("email");

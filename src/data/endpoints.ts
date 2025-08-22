@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   AUTH_DEL_WISHLIST: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/wish`,
   AUTH_CHECKOUT: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/cart/checkout`,
   AUTH_PAYMENT_REQUEST: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/payments/request`,
+  AUTH_PAYMENT_TRANSFORM: "/api/transform/payment",
   AUTH_UPDATE_SELLER_PROFILE: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/profile-setting/seller-profile`,
   AUTH_UPDATE_SELLER_IMAGE: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/profile-setting/seller-image`,
   AUTH_UPDATE_PROFILE_INFO: `${ConfigValue.NEXT_PUBLIC_REST_API_ENDPOINT}/api/panel/profile-setting/profile-info`,

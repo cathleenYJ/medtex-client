@@ -12,6 +12,8 @@ export type ParticipantData = {
   participant_company_name_zh?: string;
   job_title?: string;
   mobile_number?: string;
+  contact_phone_code?: string;
+  contact_phone_code_name?: string;
   participant_email?: string;
   dietary_preferences?: string;
 };

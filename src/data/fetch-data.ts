@@ -343,6 +343,13 @@ class FetchData {
         session,
         "admin"
       ),
+    paymentTransform: (data: PaymentData, session: Session | null = null) =>
+      this.method.post<string>(
+        API_ENDPOINTS.AUTH_PAYMENT_TRANSFORM,
+        data,
+        session,
+        "admin"
+      ),
     orderMeetingDetails: (meetingId?: number, session: Session | null = null) =>
       this.method
         .get<OrderMeetingDetailsResponse>(

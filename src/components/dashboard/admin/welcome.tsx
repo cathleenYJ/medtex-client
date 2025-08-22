@@ -30,8 +30,6 @@ const welcomeText = (pathname: string) => {
       return "Wishlist";
     case Routes.private.registrationRecord:
       return "Registration Record";
-    case Routes.private.paymentHistory:
-      return "Payment History";
     case Routes.private.profile:
       return "Profile Page";
     default:

@@ -7,7 +7,7 @@ export const Final: React.FC = () => (
     <StepInfo
       title="Payment Success!"
       nextPage={
-        <Link href={Routes.private.paymentHistory}>
+        <Link href={Routes.private.registrationRecord}>
           → Go back to homepage to find more events
         </Link>
       }

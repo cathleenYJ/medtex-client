@@ -6,9 +6,8 @@ import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { fetchData } from "@/data/fetch-data";
 import { Routes } from "@/config/routes";
-import { useCurrentRequest } from "@/hooks/use-current-request";
 import { RegistrationFormSchema } from "./state";
-import type { ParticipantData, BuyerData } from "@/types";
+import type { ParticipantData } from "@/types";
 
 /**
  * Custom hook for updating participant information
@@ -19,7 +18,6 @@ import type { ParticipantData, BuyerData } from "@/types";
 export const useParticipantUpdate = () => {
   const router = useRouter();
   const { data: session } = useSession();
-  const { setCurrentRequest } = useCurrentRequest();
   
   const { mutate: updateParticipantInfo, isPending } = useMutation({
     mutationKey: ["update-participant-info"],
@@ -31,10 +29,6 @@ export const useParticipantUpdate = () => {
 
   // 新增 meetingId 參數
   const updateParticipant = (data: z.infer<typeof RegistrationFormSchema>, meetingId?: string) => {
-    // Get account type from localStorage
-    const accountType = typeof window !== "undefined" 
-      ? localStorage.getItem("accountType") as "personal" | "corporate" | null
-      : null;
 
     // Prepare the API payload
     const apiData: ParticipantData = {
@@ -45,6 +39,8 @@ export const useParticipantUpdate = () => {
       mobile_number: data.mobileNumber,
       participant_email: data.emailAddress,
       dietary_preferences: data.dietaryPreferences?.name || "Regular",
+      contact_phone_code: data.contactPhoneCode?.id || "",
+      contact_phone_code_name: data.contactPhoneCode?.name || "",
     };
     
     // Add company name fields if they have values
@@ -55,21 +51,6 @@ export const useParticipantUpdate = () => {
     if (data.companyNameChinese && data.companyNameChinese.trim() !== '') {
       apiData.participant_company_name_zh = data.companyNameChinese;
     }
-    
-    // Set registration data for checkout (keep existing logic for compatibility)
-    setCurrentRequest({
-      buyer: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.emailAddress,
-        mobile: data.mobileNumber,
-        jobTitle: data.jobTitle,
-        accountType,
-        dietaryPreferences: data.dietaryPreferences?.name || "Regular",
-        meeting_id: 41 // Temporary ID, should come from API response
-      } as unknown as BuyerData,
-      appId: 863 // Temporary ID, should come from API response
-    });
 
     // Update participant info via API, then navigate to checkout with meetingId if present
     updateParticipantInfo(apiData, {

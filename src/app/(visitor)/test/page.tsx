@@ -8,7 +8,7 @@ import {
   ConfirmDecline,
   ConfirmMeetingRequest,
   Message,
-  VertifyEmail,
+  // VertifyEmail,
 } from "@modals/views";
 import { ProfileModal } from "@modals/views/profile-modal";
 import { CheckFat } from "@icons";
@@ -85,14 +85,14 @@ export default function TestPage() {
         variant="auth"
         onClick={() => {
           openModal(
-            <VertifyEmail
-              user_id={1057}
-              email={"Bt3Q2@example.com"}
-              password={"123456"}
-              resend={async () => {
-                window.alert("resend");
-              }}
-            />
+            // <VertifyEmail
+            //   user_id={1057}
+            //   email={"Bt3Q2@example.com"}
+            //   password={"123456"}
+            //   resend={async () => {
+            //     window.alert("resend");
+            //   }}
+            // />
           );
         }}
       >
