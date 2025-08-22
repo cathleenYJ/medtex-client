@@ -21,12 +21,15 @@ console.log(`Form name: ${name}, Total steps: ${totalNumber}, Current step: ${st
 
   const isProfileFirstStep = name === "profile" && totalNumber === 2 && Number(step) === 1;
   const isProfileSecondStep = name === "profile" && totalNumber === 2 && Number(step) === 2;
+  const isCheckoutSecondStep = name === "checkout" && totalNumber === 2 && Number(step) === 2;
   console.log(`Is profile first step: ${isProfileFirstStep}`);
   console.log(`Is profile second step: ${isProfileSecondStep}`);
+  console.log(`Is checkout second step: ${isCheckoutSecondStep}`);
 
   let minHeight;
   if (isProfileFirstStep) minHeight = 280;
   if (isProfileSecondStep) minHeight = 400;
+  if (isCheckoutSecondStep) minHeight = 280;
 
   return (
     <FormLayout minHeight={minHeight}>
